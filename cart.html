@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cart | SAFE ESCAPE</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
+<link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/images/favicon.png">
+    <style>
+        .cart-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 410px;
+            gap: 38px;
+            align-items: start;
+        }
+
+        .cart-table-wrap {
+            overflow-x: auto;
+            border-top: 1px solid #dfe4e8;
+        }
+
+        .cart-table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 20px 14px;
+            border-bottom: 1px solid #dfe4e8;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .cart-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #182431;
+        }
+
+        .cart-table th:nth-child(3),
+        .cart-table td:nth-child(3),
+        .cart-table th:last-child,
+        .cart-table td:last-child {
+            text-align: center;
+        }
+
+        .cart-item-type {
+            display: block;
+            margin-top: 7px;
+            color: #697581;
+            font-size: 13px;
+        }
+
+        .cart-stepper {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #dfe4e8;
+            background: #fff;
+        }
+
+        .cart-stepper button {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            background: #fff;
+            color: #0b1721;
+            font-size: 19px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .cart-stepper button:hover {
+            background: #f2f4f5;
+        }
+
+        .cart-stepper span {
+            min-width: 34px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .cart-remove {
+            display: block;
+            margin: 7px auto 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #e53b33;
+            font-size: 12px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .cart-empty-accessory {
+            padding: 20px 14px !important;
+            color: #697581;
+        }
+
+        .cart-summary {
+            padding: 27px;
+            color: #fff;
+            background: #07131e;
+        }
+
+        .cart-summary h2 {
+            margin: 0 0 20px;
+            color: #fff;
+            font-size: 22px;
+        }
+
+        .summary-row,
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .18);
+        }
+
+        .summary-row strong {
+            color: #fff;
+            text-align: right;
+        }
+
+        .discount-row strong {
+            color: #ff5b51;
+        }
+
+        .summary-total {
+            margin-top: 12px;
+            padding-top: 23px;
+            border-bottom: 0;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .summary-total strong {
+            color: #fff;
+            font-size: 30px;
+            white-space: nowrap;
+        }
+
+        .cart-checkout-btn {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .cart-secure-note {
+            margin: 16px 0 0;
+            color: #aab6c0;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .cart-notes {
+            margin-top: 32px;
+            padding: 24px;
+            background: #f5f7f8;
+            border-left: 4px solid #ff3b30;
+        }
+
+        .cart-notes h3 {
+            margin: 0 0 12px;
+        }
+
+        .cart-notes ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .cart-notes li {
+            margin: 9px 0;
+        }
+
+        @media (max-width: 900px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-summary {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .cart-summary {
+                padding: 20px;
+            }
+
+            .summary-total strong {
+                font-size: 25px;
+            }
+
+            .cart-notes {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body data-page="cart">
+    <div id="siteHeader"></div>
+
+    <main>
+        <section class="page-hero">
+            <div class="shell">
+                <p class="kicker">Your Cart</p>
+                <h1>Review your purchase.</h1>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="shell" id="cartContent"></div>
+        </section>
+    </main>
+
+    <div id="siteFooter"></div>
+
+    <script src="assets/js/components.js"></script>
+    <script type="module" src="assets/js/cart.js"></script>
+</body>
+
+</html>

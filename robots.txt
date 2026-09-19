@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout.html
+Disallow: /order-success.html
+Sitemap: https://www.safeescape.in/sitemap.xml

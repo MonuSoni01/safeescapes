@@ -1,0 +1,1966 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1"
+    >
+
+    <title>
+        Thank You for Your Order | SAFE ESCAPE
+    </title>
+
+    <meta name="robots" content="noindex,nofollow">
+
+    <!-- FAVICON -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="assets/images/favicon.png"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="assets/images/favicon.png"
+        type="image/png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="assets/images/favicon.png"
+    >
+
+    <!-- GLOBAL CSS -->
+    <link
+        rel="stylesheet"
+        href="assets/css/style.css"
+    >
+
+
+    <style>
+
+        /* =========================================================
+           ORDER SUCCESS PAGE
+        ========================================================= */
+
+        .success-page {
+            background:
+                linear-gradient(
+                    180deg,
+                    #f4f7f8 0%,
+                    #ffffff 100%
+                );
+
+            padding:
+                70px 0 100px;
+
+            min-height:
+                70vh;
+        }
+
+
+        .success-container {
+            width:
+                min(1100px, calc(100% - 32px));
+
+            margin:
+                0 auto;
+        }
+
+
+        /* =========================================================
+           SUCCESS HEADER
+        ========================================================= */
+
+        .success-header {
+            text-align:
+                center;
+
+            max-width:
+                760px;
+
+            margin:
+                0 auto 45px;
+        }
+
+
+        .success-check {
+            width:
+                82px;
+
+            height:
+                82px;
+
+            margin:
+                0 auto 22px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius:
+                50%;
+
+            background:
+                #11845f;
+
+            color:
+                #ffffff;
+
+            font-size:
+                42px;
+
+            font-weight:
+                900;
+
+            box-shadow:
+                0 15px 35px
+                rgba(17, 132, 95, .22);
+        }
+
+
+        .success-kicker {
+            margin:
+                0 0 10px;
+
+            color:
+                #11845f;
+
+            font-size:
+                12px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.8px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .success-header h1 {
+            margin:
+                0;
+
+            color:
+                #08121b;
+
+            font-size:
+                clamp(32px, 5vw, 50px);
+
+            line-height:
+                1.1;
+        }
+
+
+        .success-header > p:last-child {
+            max-width:
+                650px;
+
+            margin:
+                15px auto 0;
+
+            color:
+                #65727d;
+
+            font-size:
+                15px;
+
+            line-height:
+                1.7;
+        }
+
+
+        /* =========================================================
+           MAIN CARD
+        ========================================================= */
+
+        .order-card {
+            overflow:
+                hidden;
+
+            background:
+                #ffffff;
+
+            border:
+                1px solid #e1e7ea;
+
+            border-radius:
+                18px;
+
+            box-shadow:
+                0 25px 70px
+                rgba(8, 18, 27, .10);
+        }
+
+
+        /* =========================================================
+           ORDER TOP BAR
+        ========================================================= */
+
+        .order-top {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            background:
+                #08121b;
+
+            color:
+                #ffffff;
+        }
+
+
+        .order-top-item {
+            padding:
+                25px 28px;
+
+            border-right:
+                1px solid
+                rgba(255, 255, 255, .12);
+        }
+
+
+        .order-top-item:last-child {
+            border-right:
+                0;
+        }
+
+
+        .order-top-item span {
+            display:
+                block;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #aeb8bf;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1.2px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .order-top-item strong {
+            display:
+                block;
+
+            font-size:
+                18px;
+
+            word-break:
+                break-word;
+        }
+
+
+        .paid-status {
+            display:
+                inline-flex !important;
+
+            width:
+                auto;
+
+            padding:
+                7px 12px;
+
+            border-radius:
+                50px;
+
+            background:
+                #11845f;
+
+            color:
+                #ffffff !important;
+
+            font-size:
+                11px !important;
+
+            letter-spacing:
+                .8px !important;
+        }
+
+
+        /* =========================================================
+           BODY
+        ========================================================= */
+
+        .order-body {
+            padding:
+                35px;
+        }
+
+
+        .order-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                minmax(0, 1.25fr)
+                minmax(300px, .75fr);
+
+            gap:
+                35px;
+        }
+
+
+        .order-section {
+            margin-bottom:
+                35px;
+        }
+
+
+        .order-section:last-child {
+            margin-bottom:
+                0;
+        }
+
+
+        .section-heading {
+            padding-bottom:
+                12px;
+
+            margin:
+                0 0 18px;
+
+            border-bottom:
+                1px solid #e4e9ec;
+
+            color:
+                #08121b;
+
+            font-size:
+                18px;
+        }
+
+
+        /* =========================================================
+           CUSTOMER DETAILS
+        ========================================================= */
+
+        .customer-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap:
+                16px;
+        }
+
+
+        .detail-box {
+            padding:
+                16px;
+
+            background:
+                #f7f9fa;
+
+            border:
+                1px solid #e7ecef;
+
+            border-radius:
+                10px;
+        }
+
+
+        .detail-box.full {
+            grid-column:
+                1 / -1;
+        }
+
+
+        .detail-box span {
+            display:
+                block;
+
+            margin-bottom:
+                5px;
+
+            color:
+                #7a8790;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .7px;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .detail-box strong,
+        .detail-box p {
+            margin:
+                0;
+
+            color:
+                #17232c;
+
+            font-size:
+                14px;
+
+            line-height:
+                1.6;
+
+            word-break:
+                break-word;
+        }
+
+
+        /* =========================================================
+           PRODUCT
+        ========================================================= */
+
+        .product-row {
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            justify-content:
+                space-between;
+
+            gap:
+                20px;
+
+            padding:
+                18px 0;
+
+            border-bottom:
+                1px solid #e8ecef;
+        }
+
+
+        .product-row:first-of-type {
+            padding-top:
+                0;
+        }
+
+
+        .product-row:last-child {
+            border-bottom:
+                0;
+        }
+
+
+        .product-info strong {
+            display:
+                block;
+
+            color:
+                #08121b;
+
+            font-size:
+                15px;
+        }
+
+
+        .product-info span {
+            display:
+                block;
+
+            margin-top:
+                5px;
+
+            color:
+                #75818a;
+
+            font-size:
+                12px;
+        }
+
+
+        .product-price {
+            color:
+                #08121b;
+
+            font-size:
+                14px;
+
+            font-weight:
+                900;
+
+            white-space:
+                nowrap;
+        }
+
+
+        /* =========================================================
+           TOTAL SUMMARY
+        ========================================================= */
+
+        .price-card {
+            padding:
+                24px;
+
+            background:
+                #f7f9fa;
+
+            border:
+                1px solid #e3e8eb;
+
+            border-radius:
+                12px;
+        }
+
+
+        .price-row {
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            gap:
+                15px;
+
+            padding:
+                10px 0;
+
+            color:
+                #58656e;
+
+            font-size:
+                13px;
+        }
+
+
+        .price-row.discount strong {
+            color:
+                #11845f;
+        }
+
+
+        .price-total {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                15px;
+
+            margin-top:
+                12px;
+
+            padding-top:
+                18px;
+
+            border-top:
+                2px solid #08121b;
+
+            color:
+                #08121b;
+        }
+
+
+        .price-total span {
+            font-size:
+                14px;
+
+            font-weight:
+                800;
+        }
+
+
+        .price-total strong {
+            color:
+                #ee372f;
+
+            font-size:
+                23px;
+        }
+
+
+        /* =========================================================
+           EMAIL NOTICE
+        ========================================================= */
+
+        .email-notice {
+            margin-top:
+                30px;
+
+            padding:
+                22px;
+
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            gap:
+                15px;
+
+            background:
+                #eef9f5;
+
+            border:
+                1px solid #cce9de;
+
+            border-left:
+                4px solid #11845f;
+
+            border-radius:
+                10px;
+        }
+
+
+        .email-icon {
+            flex:
+                0 0 44px;
+
+            width:
+                44px;
+
+            height:
+                44px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius:
+                50%;
+
+            background:
+                #11845f;
+
+            color:
+                #ffffff;
+
+            font-size:
+                19px;
+        }
+
+
+        .email-notice strong {
+            display:
+                block;
+
+            margin-bottom:
+                5px;
+
+            color:
+                #08121b;
+
+            font-size:
+                14px;
+        }
+
+
+        .email-notice p {
+            margin:
+                0;
+
+            color:
+                #52655e;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.6;
+        }
+
+
+        /* =========================================================
+           SHIPPING
+        ========================================================= */
+
+        .shipping-card {
+            margin-top:
+                20px;
+
+            padding:
+                20px;
+
+            border:
+                1px solid #e2e7ea;
+
+            border-radius:
+                12px;
+        }
+
+
+        .shipping-card span {
+            display:
+                block;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #77848d;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                .8px;
+        }
+
+
+        .shipping-card strong {
+            color:
+                #08121b;
+
+            font-size:
+                14px;
+
+            text-transform:
+                capitalize;
+        }
+
+
+        /* =========================================================
+           ACTIONS
+        ========================================================= */
+
+        .success-actions {
+            display:
+                flex;
+
+            justify-content:
+                center;
+
+            gap:
+                12px;
+
+            flex-wrap:
+                wrap;
+
+            margin-top:
+                35px;
+        }
+
+
+        .success-btn {
+            min-height:
+                52px;
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            padding:
+                0 25px;
+
+            border-radius:
+                8px;
+
+            text-decoration:
+                none;
+
+            font-size:
+                12px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                .5px;
+
+            transition:
+                .2s ease;
+        }
+
+
+        .success-btn.primary {
+            background:
+                #ee372f;
+
+            color:
+                #ffffff;
+        }
+
+
+        .success-btn.primary:hover {
+            background:
+                #d72f28;
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        .success-btn.secondary {
+            background:
+                #08121b;
+
+            color:
+                #ffffff;
+        }
+
+
+        /* =========================================================
+           LOADING
+        ========================================================= */
+
+        .order-loading {
+            padding:
+                55px 20px;
+
+            text-align:
+                center;
+
+            color:
+                #66737d;
+        }
+
+
+        .order-error {
+            padding:
+                30px;
+
+            text-align:
+                center;
+
+            background:
+                #fff4f3;
+
+            color:
+                #b52e28;
+
+            border-radius:
+                10px;
+        }
+
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media(max-width: 800px) {
+
+            .success-page {
+                padding:
+                    45px 0 70px;
+            }
+
+
+            .order-top {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .order-top-item {
+                border-right:
+                    0;
+
+                border-bottom:
+                    1px solid
+                    rgba(255, 255, 255, .12);
+            }
+
+
+            .order-top-item:last-child {
+                border-bottom:
+                    0;
+            }
+
+
+            .order-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .customer-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .detail-box.full {
+                grid-column:
+                    auto;
+            }
+
+        }
+
+
+        @media(max-width: 520px) {
+
+            .success-container {
+                width:
+                    min(100% - 20px, 1100px);
+            }
+
+
+            .order-body {
+                padding:
+                    22px 16px;
+            }
+
+
+            .success-check {
+                width:
+                    68px;
+
+                height:
+                    68px;
+
+                font-size:
+                    34px;
+            }
+
+
+            .success-header h1 {
+                font-size:
+                    31px;
+            }
+
+
+            .product-row {
+                gap:
+                    10px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+    <div id="siteHeader"></div>
+
+
+    <main>
+
+
+        <section class="success-page">
+
+
+            <div class="success-container">
+
+
+                <!-- =================================================
+                     SUCCESS
+                ================================================== -->
+
+                <div class="success-header">
+
+                    <div class="success-check">
+                        ✓
+                    </div>
+
+                    <p class="success-kicker">
+                        Payment Confirmed
+                    </p>
+
+                    <h1>
+                        Thank You for Your Order!
+                    </h1>
+
+                    <p>
+                        Congratulations! Your payment has been successfully
+                        confirmed and we have received your SAFE ESCAPE order.
+                    </p>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ORDER DETAILS
+                ================================================== -->
+
+                <div
+                    class="order-card"
+                    id="orderDetails"
+                >
+
+                    <div class="order-loading">
+                        Loading your order details…
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
+                <div class="success-actions">
+
+                    <a
+                        href="index.html"
+                        class="success-btn primary"
+                    >
+                        BACK TO HOME →
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <div id="siteFooter"></div>
+
+
+    <script src="assets/js/components.js"></script>
+
+
+    <!-- SUCCESS PAGE JS -->
+    <script type="module">
+
+        import {
+            firebaseConfig
+        } from './assets/js/firebase-config.js';
+
+
+        import {
+            initializeApp
+        } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+
+
+        import {
+            getFirestore,
+            doc,
+            getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+
+
+        /* =========================================================
+           FIREBASE
+        ========================================================= */
+
+        const app =
+            initializeApp(firebaseConfig);
+
+
+        const db =
+            getFirestore(app);
+
+
+
+        /* =========================================================
+           ELEMENT
+        ========================================================= */
+
+        const container =
+            document.querySelector(
+                '#orderDetails'
+            );
+
+
+
+        /* =========================================================
+           HELPERS
+        ========================================================= */
+
+        function escapeHTML(value) {
+
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+
+        }
+
+
+        function money(value) {
+
+            return new Intl.NumberFormat(
+                'en-IN',
+                {
+                    style:
+                        'currency',
+
+                    currency:
+                        'INR',
+
+                    maximumFractionDigits:
+                        0
+                }
+            ).format(
+                Number(value) || 0
+            );
+
+        }
+
+
+        function formatDate(value) {
+
+            if (!value) {
+
+                return new Date()
+                    .toLocaleDateString(
+                        'en-IN'
+                    );
+
+            }
+
+
+            try {
+
+                const date =
+                    typeof value.toDate === 'function'
+                        ? value.toDate()
+                        : new Date(value);
+
+
+                return date.toLocaleDateString(
+                    'en-IN',
+                    {
+                        day:
+                            '2-digit',
+
+                        month:
+                            'short',
+
+                        year:
+                            'numeric'
+                    }
+                );
+
+            }
+
+            catch {
+
+                return '';
+            }
+
+        }
+
+
+
+        /* =========================================================
+           GET ORDER ID
+        ========================================================= */
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const orderId =
+            params.get('order');
+
+
+        const urlOrderNumber =
+            params.get('orderNo');
+
+
+        if (!orderId) {
+
+            container.innerHTML = `
+
+                <div class="order-error">
+
+                    We could not find an order reference
+                    in this page URL.
+
+                </div>
+
+            `;
+
+        }
+
+        else {
+
+            loadOrder();
+
+        }
+
+
+
+        /* =========================================================
+           LOAD ORDER FROM FIRESTORE
+        ========================================================= */
+
+        async function loadOrder() {
+
+            try {
+
+
+                const orderRef =
+                    doc(
+                        db,
+                        'orders',
+                        orderId
+                    );
+
+
+                const snapshot =
+                    await getDoc(
+                        orderRef
+                    );
+
+
+                if (!snapshot.exists()) {
+
+                    throw new Error(
+                        'Order not found.'
+                    );
+
+                }
+
+
+                const order =
+                    snapshot.data();
+
+
+                renderOrder(
+                    order
+                );
+
+
+            }
+
+            catch (error) {
+
+
+                console.error(
+                    'Order Success Error:',
+                    error
+                );
+
+
+                /*
+                 If Firestore rules don't allow
+                 public order reads, still show
+                 basic verified success information
+                 received through URL.
+                */
+
+                container.innerHTML = `
+
+                    <div class="order-body">
+
+                        <div class="order-error">
+
+                            <strong>
+                                Your payment was confirmed.
+                            </strong>
+
+                            <br><br>
+
+                            Order No:
+                            ${
+                                escapeHTML(
+                                    urlOrderNumber ||
+                                    orderId
+                                )
+                            }
+
+                            <br><br>
+
+                            Your complete order details and invoice
+                            will be sent to your registered email
+                            address as soon as possible.
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+
+        /* =========================================================
+           RENDER ORDER
+        ========================================================= */
+
+        function renderOrder(order) {
+
+
+            const customer =
+                order.customer || {};
+
+
+            const pricing =
+                order.pricing || {};
+
+
+            const cart =
+                order.cart || {};
+
+
+            const shipping =
+                order.shipping || {};
+
+
+            const orderNumber =
+                order.orderNumber ||
+                urlOrderNumber ||
+                orderId;
+
+
+            const paymentStatus =
+                String(
+                    order.status ||
+                    'paid'
+                ).toUpperCase();
+
+
+            /* =====================================================
+               PRODUCT ITEMS
+            ====================================================== */
+
+            let itemsHTML = `
+
+                <div class="product-row">
+
+                    <div class="product-info">
+
+                        <strong>
+                            SAFE ESCAPE
+                        </strong>
+
+                        <span>
+                            ${
+                                escapeHTML(
+                                    cart.length || ''
+                                )
+                            } metre
+                            ×
+                            ${
+                                escapeHTML(
+                                    cart.quantity || 1
+                                )
+                            }
+                        </span>
+
+                    </div>
+
+                    <div class="product-price">
+
+                        ${
+                            money(
+                                pricing.product
+                            )
+                        }
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+
+            /* ACCESSORIES */
+
+            if (
+                Array.isArray(
+                    cart.accessories
+                )
+            ) {
+
+                cart.accessories.forEach(
+                    accessory => {
+
+
+                        itemsHTML += `
+
+                            <div class="product-row">
+
+                                <div class="product-info">
+
+                                    <strong>
+                                        ${
+                                            escapeHTML(
+                                                accessory.name
+                                            )
+                                        }
+                                    </strong>
+
+                                    <span>
+                                        Quantity:
+                                        ${
+                                            escapeHTML(
+                                                accessory.quantity || 1
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
+
+                                <div class="product-price">
+
+                                    ${
+                                        money(
+                                            Number(
+                                                accessory.price || 0
+                                            )
+                                            *
+                                            Number(
+                                                accessory.quantity || 1
+                                            )
+                                        )
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+            }
+
+
+
+            /* =====================================================
+               INSTALLATION ADDRESS
+            ====================================================== */
+
+            const installationAddress =
+                customer.installationAddress ||
+                customer.address ||
+                '—';
+
+
+
+            /* =====================================================
+               HTML
+            ====================================================== */
+
+            container.innerHTML = `
+
+
+                <!-- =============================================
+                     TOP SUMMARY
+                ============================================== -->
+
+                <div class="order-top">
+
+
+                    <div class="order-top-item">
+
+                        <span>
+                            Order Number
+                        </span>
+
+                        <strong>
+                            ${
+                                escapeHTML(
+                                    orderNumber
+                                )
+                            }
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-top-item">
+
+                        <span>
+                            Payment Status
+                        </span>
+
+                        <strong class="paid-status">
+                            ✓ ${escapeHTML(paymentStatus)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-top-item">
+
+                        <span>
+                            Order Date
+                        </span>
+
+                        <strong>
+                            ${
+                                formatDate(
+                                    order.paidAt ||
+                                    order.createdAt
+                                )
+                            }
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="order-body">
+
+
+                    <div class="order-grid">
+
+
+                        <!-- =====================================
+                             LEFT
+                        ====================================== -->
+
+                        <div>
+
+
+                            <!-- ORDER -->
+
+                            <section class="order-section">
+
+                                <h2 class="section-heading">
+                                    Order Details
+                                </h2>
+
+                                ${itemsHTML}
+
+                            </section>
+
+
+
+                            <!-- CUSTOMER -->
+
+                            <section class="order-section">
+
+                                <h2 class="section-heading">
+                                    Customer Details
+                                </h2>
+
+
+                                <div class="customer-grid">
+
+
+                                    <div class="detail-box">
+
+                                        <span>
+                                            Customer Name
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                escapeHTML(
+                                                    customer.fullName ||
+                                                    '—'
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="detail-box">
+
+                                        <span>
+                                            Mobile Number
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                escapeHTML(
+                                                    customer.mobile ||
+                                                    '—'
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="detail-box full">
+
+                                        <span>
+                                            Registered Email
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                escapeHTML(
+                                                    customer.email ||
+                                                    '—'
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    ${
+                                        customer.companyName
+                                        ? `
+
+                                            <div class="detail-box">
+
+                                                <span>
+                                                    Company
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        escapeHTML(
+                                                            customer.companyName
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+                                        `
+                                        : ''
+                                    }
+
+
+                                    ${
+                                        customer.companyGST
+                                        ? `
+
+                                            <div class="detail-box">
+
+                                                <span>
+                                                    GSTIN
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        escapeHTML(
+                                                            customer.companyGST
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+                                        `
+                                        : ''
+                                    }
+
+
+                                    <div class="detail-box full">
+
+                                        <span>
+                                            Billing Address
+                                        </span>
+
+                                        <p>
+
+                                            ${
+                                                escapeHTML(
+                                                    customer.address ||
+                                                    '—'
+                                                )
+                                            }
+
+                                            <br>
+
+                                            ${
+                                                escapeHTML(
+                                                    customer.city ||
+                                                    ''
+                                                )
+                                            }
+
+                                            ${
+                                                customer.state
+                                                ? ', ' +
+                                                  escapeHTML(
+                                                      customer.state
+                                                  )
+                                                : ''
+                                            }
+
+                                            ${
+                                                customer.pincode
+                                                ? ' - ' +
+                                                  escapeHTML(
+                                                      customer.pincode
+                                                  )
+                                                : ''
+                                            }
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <div class="detail-box full">
+
+                                        <span>
+                                            Installation Address
+                                        </span>
+
+                                        <p>
+                                            ${
+                                                escapeHTML(
+                                                    installationAddress
+                                                )
+                                            }
+                                        </p>
+
+                                    </div>
+
+
+                                </div>
+
+                            </section>
+
+
+                        </div>
+
+
+
+                        <!-- =====================================
+                             RIGHT
+                        ====================================== -->
+
+                        <div>
+
+
+                            <section class="order-section">
+
+                                <h2 class="section-heading">
+                                    Payment Summary
+                                </h2>
+
+
+                                <div class="price-card">
+
+
+                                    <div class="price-row">
+
+                                        <span>
+                                            Subtotal
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                money(
+                                                    pricing.subtotal
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="price-row discount">
+
+                                        <span>
+                                            Bulk Discount
+                                        </span>
+
+                                        <strong>
+                                            −${
+                                                money(
+                                                    pricing.bulk
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="price-row discount">
+
+                                        <span>
+                                            Coupon Discount
+                                        </span>
+
+                                        <strong>
+                                            −${
+                                                money(
+                                                    pricing.couponDiscount
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="price-total">
+
+                                        <span>
+                                            Amount Paid
+                                        </span>
+
+                                        <strong>
+                                            ${
+                                                money(
+                                                    pricing.total
+                                                )
+                                            }
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="shipping-card">
+
+                                    <span>
+                                        Shipping Status
+                                    </span>
+
+                                    <strong>
+                                        ${
+                                            escapeHTML(
+                                                shipping.status ||
+                                                'Processing'
+                                            )
+                                        }
+                                    </strong>
+
+                                </div>
+
+
+                                ${
+                                    order.invoiceNumber
+                                    ? `
+
+                                        <div class="shipping-card">
+
+                                            <span>
+                                                Invoice Number
+                                            </span>
+
+                                            <strong>
+                                                ${
+                                                    escapeHTML(
+                                                        order.invoiceNumber
+                                                    )
+                                                }
+                                            </strong>
+
+                                        </div>
+
+                                    `
+                                    : ''
+                                }
+
+
+                            </section>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =========================================
+                         EMAIL INFORMATION
+                    ========================================== -->
+
+                    <div class="email-notice">
+
+
+                        <div class="email-icon">
+                            ✉
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                Order confirmation & invoice
+                            </strong>
+
+                            <p>
+
+                                Your order has been successfully confirmed.
+                                Your complete order details and invoice will
+                                be sent to your registered email address
+
+                                ${
+                                    customer.email
+                                    ? `<strong>${escapeHTML(customer.email)}</strong>`
+                                    : ''
+                                }
+
+                                as soon as possible.
+
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+            `;
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

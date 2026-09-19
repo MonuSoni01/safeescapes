@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Refer & Earn | SAFE ESCAPE</title>
+    
+    <!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
+<link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/images/favicon.png">
+    <meta name="description"
+        content="Join the SAFE ESCAPE Partner Network. Refer high-rise safety requirements and earn commission on every successful closure.">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        :root {
+            --se-dark: #07131e;
+            --se-red: #ff3b30;
+            --se-muted: #64717c;
+            --se-line: #e2e7ea;
+            --se-soft: #f4f7f8;
+        }
+
+        .refer-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 110px 0 92px;
+            color: #fff;
+            background:
+                linear-gradient(90deg, rgba(5, 16, 27, .96) 0%, rgba(5, 16, 27, .84) 48%, rgba(5, 16, 27, .38) 100%),
+                url("assets/images/refer.png") center/cover;
+        }
+
+        .refer-hero::after {
+            content: "";
+            position: absolute;
+            width: 380px;
+            height: 380px;
+            right: -100px;
+            bottom: -160px;
+            border: 55px solid rgba(255, 59, 48, .14);
+            border-radius: 50%;
+        }
+
+        .refer-hero .shell {
+            position: relative;
+            z-index: 1; 
+        }
+
+        .refer-hero .kicker {
+            color: #ff7169;
+        }
+
+        .refer-hero h1 {
+            max-width: 720px;
+            margin: 12px 0 18px;
+            color: #fff;
+            font-size: clamp(38px, 5vw, 67px);
+            line-height: 1.05;
+        }
+
+        .refer-hero p:not(.kicker) {
+            max-width: 690px;
+            margin: 0;
+            color: rgba(255, 255, 255, .82);
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        .refer-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 30px;
+        }
+
+        .refer-hero .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 22px;
+            border: 1px solid rgba(255, 255, 255, .55);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: .25s ease;
+        }
+
+        .refer-hero .btn-outline:hover {
+            background: #fff;
+            color: var(--se-dark);
+        }
+
+        .refer-intro {
+            display: grid;
+            grid-template-columns: .9fr 1.1fr;
+            gap: 65px;
+            align-items: center;
+        }
+
+        .refer-stamp {
+            display: grid;
+            place-items: center;
+            aspect-ratio: 1;
+            max-width: 390px;
+            margin: auto;
+            border: 1px solid var(--se-line);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at center, #fff 0 48%, transparent 48.5%),
+                linear-gradient(135deg, #f6f8f9, #e8edef);
+            text-align: center;
+        }
+
+        .refer-stamp .icon {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--se-red);
+            font-size: 64px;
+        }
+
+        .refer-stamp strong {
+            display: block;
+            color: var(--se-dark);
+            font-size: 24px;
+        }
+
+        .refer-stamp span {
+            display: block;
+            margin-top: 8px;
+            color: var(--se-muted);
+            font-size: 14px;
+        }
+
+        .refer-copy h2,
+        .partner-section h2,
+        .how-it-works h2,
+        .refer-form-box h2 {
+            margin: 8px 0 16px;
+            color: var(--se-dark);
+        }
+
+        .refer-copy p {
+            color: var(--se-muted);
+            line-height: 1.75;
+        }
+
+        .partner-section {
+            background: var(--se-soft);
+        }
+
+        .partner-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            margin-top: 34px;
+        }
+
+        .partner-card {
+            padding: 25px;
+            border: 1px solid var(--se-line);
+            background: #fff;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 30px rgba(7, 19, 30, .10);
+        }
+
+        .partner-card .partner-icon {
+            display: grid;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            margin-bottom: 18px;
+            background: #fff0ef;
+            color: var(--se-red);
+            font-size: 23px;
+        }
+
+        .partner-card h3 {
+            margin: 0 0 10px;
+            color: var(--se-dark);
+            font-size: 18px;
+        }
+
+        .partner-card p {
+            margin: 0;
+            color: var(--se-muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .how-it-works {
+            text-align: center;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 26px;
+            margin-top: 38px;
+        }
+
+        .process-card {
+            position: relative;
+            padding: 34px 25px;
+            border: 1px solid var(--se-line);
+            text-align: left;
+        }
+
+        .process-number {
+            display: inline-grid;
+            width: 44px;
+            height: 44px;
+            place-items: center;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            background: var(--se-red);
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .process-card h3 {
+            margin: 0 0 10px;
+            color: var(--se-dark);
+        }
+
+        .process-card p {
+            margin: 0;
+            color: var(--se-muted);
+            line-height: 1.65;
+        }
+
+        .refer-bottom {
+            background: var(--se-dark);
+        }
+
+        .refer-bottom-grid {
+            display: grid;
+            grid-template-columns: .85fr 1.15fr;
+            gap: 55px;
+            align-items: start;
+        }
+
+        .refer-bottom-copy {
+            color: #fff;
+        }
+
+        .refer-bottom-copy .kicker {
+            color: #ff7169;
+        }
+
+        .refer-bottom-copy h2 {
+            margin: 10px 0 16px;
+            color: #fff;
+        }
+
+        .refer-bottom-copy p {
+            color: #b8c3ca;
+            line-height: 1.75;
+        }
+
+        .refer-form-box {
+            padding: 32px;
+            background: #fff;
+        }
+
+        .refer-form-box h2 {
+            font-size: 28px;
+        }
+
+        .refer-form-box p {
+            margin: 0 0 23px;
+            color: var(--se-muted);
+        }
+
+        .refer-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .refer-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .refer-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .refer-field label {
+            color: var(--se-dark);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .refer-field input,
+        .refer-field select,
+        .refer-field textarea {
+            width: 100%;
+            min-height: 48px;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #d8dfe3;
+            border-radius: 0;
+            outline: none;
+            color: var(--se-dark);
+            font: inherit;
+        }
+
+        .refer-field textarea {
+            min-height: 105px;
+            resize: vertical;
+        }
+
+        .refer-field input:focus,
+        .refer-field select:focus,
+        .refer-field textarea:focus {
+            border-color: var(--se-red);
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, .12);
+        }
+
+        .refer-form-box .btn {
+            width: 100%;
+            margin-top: 18px;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .form-message {
+            display: none;
+            margin: 16px 0 0;
+            color: #11875d;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-message.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .refer-intro,
+            .refer-bottom-grid {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+
+            .partner-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .refer-stamp {
+                width: min(100%, 340px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .refer-hero {
+                padding: 82px 0 70px;
+            }
+
+            .partner-grid,
+            .process-grid,
+            .refer-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .refer-field.full {
+                grid-column: auto;
+            }
+
+            .refer-form-box {
+                padding: 24px 18px;
+            }
+        }
+        .refer-stamp {
+    padding: 22px;
+    box-sizing: border-box;
+}
+
+.refer-stamp img {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto 14px;
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+}
+    </style>
+</head>
+
+<body data-page="refer-earn">
+
+    <div id="siteHeader"></div>
+
+    <main>
+
+        <section class="refer-hero">
+            <div class="shell">
+                <p class="kicker">SAFE ESCAPE Partner Network</p>
+
+                <h1>Build Safer Spaces.<br>Earn Every Time You Refer.</h1>
+
+                <p>
+                    Partner with SAFE ESCAPE to bring emergency evacuation solutions
+                    to your clients and unlock a rewarding new revenue stream.
+                </p>
+
+                <div class="refer-hero-actions">
+                    <a class="btn" href="#referForm">Become a Referral Partner →</a>
+                    <a class="btn-outline" href="#howItWorks">How It Works</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="shell refer-intro">
+
+                <div class="refer-stamp">
+    <img src="assets/images/refer-partnership.png"
+        alt="SAFE ESCAPE referral partnership for safer high-rise buildings">
+
+    <strong>Refer. We Close.<br>You Earn.</strong>
+    <span>Partner with purpose</span>
+</div>
+
+                <div class="refer-copy"> 
+
+                    <p>Join the “SAFE ESCAPE Safety Ambassador Program”</p>
+<h2>Help Clients improve Safety While Growing Your Income</h2>
+                    <p>
+                        When you refer a client to SAFE ESCAPE, our team handles the
+                        consultation, site assessment, product mapping and installation
+                        coordination. You earn a commission after successful closure and
+                        implementation.
+                    </p>
+
+                    <p>
+                        It is a practical way to add high-rise safety value to your
+                        existing professional network without managing technical
+                        installation yourself.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="section partner-section">
+            <div class="shell">
+                <p class="kicker">Who Can Partner With Us</p>
+                <h2>Built for professionals who influence safer spaces.</h2>
+
+                <div class="partner-grid">
+
+                    <article class="partner-card">
+                        <div class="partner-icon">⌂</div>
+                        <h3>Architects & Structural Engineers</h3>
+                        <p>Integrate modern life-safety planning into high-rise project discussions.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">▦</div>
+                        <h3>Builders, Developers & PMC Firms</h3>
+                        <p>Strengthen the safety value of residential and commercial projects.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">⚙</div>
+                        <h3>M&E, HVAC & Fire Contractors</h3>
+                        <p>Expand your safety portfolio with an emergency exit solution.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">▣</div>
+                        <h3>Hardware & Material Suppliers</h3>
+                        <p>Add premium escape-system solutions to your product offering.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">✦</div>
+                        <h3>Interior Designers</h3>
+                        <p>Ensure contemporary spaces also consider high-rise safety readiness.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">✓</div>
+                        <h3>Facility & Corporate Admin Teams</h3>
+                        <p>Upgrade workplace and residential safety preparedness.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">⌁</div>
+                        <h3>Real Estate Consultants & Brokers</h3>
+                        <p>Offer an added safety advantage to safety-conscious buyers.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">⌂</div>
+                        <h3>RWAs & Society Board Members</h3>
+                        <p>Support safer communities with a structured high-rise safety solution.</p>
+                    </article>
+
+                    <article class="partner-card">
+                        <div class="partner-icon">↗</div>
+                        <h3>HNIs & Business Leaders</h3>
+                        <p>Refer your corporate, residential or professional network with confidence.</p>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="section how-it-works" id="howItWorks">
+            <div class="shell">
+                <p class="kicker">Simple Three-Step Process</p>
+                <h2>How the Refer & Earn programme works</h2>
+
+                <div class="process-grid">
+
+                    <article class="process-card">
+                        <span class="process-number">01</span>
+                        <h3>Refer</h3>
+                        <p>Connect your client, building, project or professional network with our safety experts.</p>
+                    </article>
+
+                    <article class="process-card">
+                        <span class="process-number">02</span>
+                        <h3>We Close</h3>
+                        <p>Our team handles consultation, site assessment, product mapping and final sale.</p>
+                    </article>
+
+                    <article class="process-card">
+                        <span class="process-number">03</span>
+                        <h3>You Earn</h3>
+                        <p>Receive your referral payout after successful order closure and implementation.</p>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="section refer-bottom" id="referForm">
+            <div class="shell refer-bottom-grid">
+
+                <div class="refer-bottom-copy">
+                    <p class="kicker">Start Your Partnership</p>
+                    <h2>Refer safer high-rise solutions today.</h2>
+
+                    <p>
+                        Share your details and our partnership team will connect with
+                        you to understand your network, project opportunities and
+                        referral process.
+                    </p>
+
+                    <p>
+                        Together, we can help make high-rise living and working
+                        environments safer.
+                    </p>
+                </div>
+
+                <div class="refer-form-box">
+                    <h2>Become a Referral Partner</h2>
+                    <p>Please share your details. Our team will contact you shortly.</p>
+
+                    <form id="referEarnForm" data-sheet-form="referral">
+                        <div class="refer-form-grid">
+
+                            <div class="refer-field">
+                                <label for="partnerName">Full Name *</label>
+                                <input id="partnerName" name="name" type="text"
+                                    placeholder="Enter your name" required>
+                            </div>
+
+                            <div class="refer-field">
+                                <label for="partnerPhone">Mobile Number *</label>
+                                <input id="partnerPhone" name="phone" type="tel"
+                                    placeholder="Enter mobile number"
+                                    inputmode="numeric" required>
+                            </div>
+
+                            <div class="refer-field">
+                                <label for="partnerEmail">Email Address *</label>
+                                <input id="partnerEmail" name="email" type="email"
+                                    placeholder="Enter email address" required>
+                            </div>
+
+                            <div class="refer-field">
+                                <label for="partnerProfession">Profession *</label>
+                                <select id="partnerProfession" name="profession" required>
+                                    <option value="">Select your profession</option>
+                                    <option>Architect / Structural Engineer</option>
+                                    <option>Builder / Developer / PMC</option>
+                                    <option>Fire / HVAC / M&E Contractor</option>
+                                    <option>Hardware / Material Supplier</option>
+                                    <option>Interior Designer</option>
+                                    <option>Facility / Corporate Admin</option>
+                                    <option>Real Estate Consultant / Broker</option>
+                                    <option>RWA / Society Representative</option>
+                                    <option>Business Leader / Other</option>
+                                </select>
+                            </div>
+
+                            <div class="refer-field full">
+                                <label for="partnerCity">City / Service Location *</label>
+                                <input id="partnerCity" name="city" type="text"
+                                    placeholder="Example: Delhi, Noida, Gurgaon" required>
+                            </div>
+
+                            <div class="refer-field full">
+                                <label for="partnerMessage">Project / Referral Details</label>
+                                <textarea id="partnerMessage" name="message"
+                                    placeholder="Tell us about your client, project or referral opportunity."></textarea>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="btn">
+                            Submit Partner Enquiry →
+                        </button>
+
+                        <p class="form-message" id="formMessage">
+                            Thank you. Your referral partner enquiry is ready to be submitted.
+                        </p>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="siteFooter"></div>
+
+    <script src="assets/js/components.js"></script>
+
+    <script>
+        false && document.getElementById('referEarnForm')?.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+            const phone = form.phone.value.trim().replace(/\D/g, '');
+
+            if (phone.length < 10 || phone.length > 15) {
+                alert('Please enter a valid mobile number.');
+                form.phone.focus();
+                return;
+            }
+
+            const enquiry = {
+                interest: 'Refer & Earn Partner Enquiry',
+                name: form.name.value.trim(),
+                phone: form.phone.value.trim(),
+                email: form.email.value.trim(),
+                profession: form.profession.value,
+                city: form.city.value.trim(),
+                message: form.message.value.trim(),
+                submittedAt: new Date().toISOString()
+            };
+
+            /*
+             * Existing contact page / Firebase form integration ho to
+             * yahan apna Firebase submit function add karna hai.
+             */
+            localStorage.setItem('safeEscapeReferEarnLead', JSON.stringify(enquiry));
+
+            document.getElementById('formMessage').classList.add('show');
+
+            setTimeout(() => {
+                window.location.href =
+                    'contact.html?interest=Refer%20%26%20Earn%20Partner%20Enquiry';
+            }, 1200);
+        });
+    </script>
+    <script type="module" src="assets/js/form.js"></script>
+
+</body>
+</html>

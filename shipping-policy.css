@@ -1,0 +1,23 @@
+body{
+font-family:Arial,sans-serif;
+background:#fff;
+color:#111;
+margin:0;
+}
+
+.policy-hero{
+background:#000;
+color:#fff;
+padding:80px 8%;
+}
+
+.policy-content{
+max-width:1000px;
+margin:auto;
+padding:60px 20px;
+line-height:1.8;
+}
+
+h1,h2{
+letter-spacing:-1px;
+}

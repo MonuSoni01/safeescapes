@@ -1,0 +1,2316 @@
+/* =====================================================
+SAFE ESCAPE PREMIUM PRODUCT PAGE CSS
+ONLY PRODUCT SECTION
+HEADER / FOOTER CSS NOT INCLUDED
+===================================================== */
+
+
+/* ===============================
+GLOBAL PRODUCT VARIABLES
+================================ */
+
+:root{
+    --safe-black:#071923;
+    --safe-yellow:#ffc400;
+    --safe-border:#e2e8ec;
+    --safe-grey:#64748b;
+    --safe-bg:#f8fafc;
+    --safe-red:#ed3124;
+}
+
+
+
+/* ===============================
+BREADCRUMB
+================================ */
+
+.breadcrumb{
+
+    background:#f8fafc;
+    padding:18px 5%;
+    font-size:13px;
+    color:#64748b;
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+
+
+/* ===============================
+PRODUCT MAIN LAYOUT
+================================ */
+
+.safe-product-page{
+
+    padding:0px 0px 20px 0px;
+    background:#fff;
+
+}
+
+
+.safe-container{
+
+    width:min(1250px,92%);
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+
+}
+
+
+
+/* ===============================
+GALLERY
+================================ */
+
+
+.gallery{
+
+    position:sticky;
+    top:100px;
+
+}
+
+
+
+.main-image-box{
+
+    height:620px;
+    background:#f3f5f6;
+
+    border-radius:22px;
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+
+
+.main-image-box img,
+.main-image-box video{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+
+
+.main-image-box video{
+
+    display:none;
+
+}
+
+
+
+.video-overlay{
+
+    position:absolute;
+    left:25px;
+    bottom:25px;
+
+}
+
+
+
+.video-overlay button{
+
+    width:65px;
+    height:65px;
+
+    border-radius:50%;
+    border:none;
+
+    background:var(--safe-yellow);
+
+    font-size:22px;
+    cursor:pointer;
+
+}
+
+
+
+/* Thumbnail */
+
+
+.thumb-row{
+
+    display:flex;
+    gap:15px;
+
+    margin-top:18px;
+
+}
+
+
+
+.thumb-row img,
+.thumb-video{
+
+    width:90px;
+    height:80px;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    border:1px solid #ddd;
+
+    cursor:pointer;
+
+}
+
+
+
+.thumb-video{
+ 
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:25px;
+
+}
+
+
+
+/* ===============================
+PRODUCT DETAILS
+================================ */
+
+
+.safe-content{
+
+    padding-top:10px;
+
+}
+
+
+
+.badges{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+}
+
+
+
+.badges span{
+
+    padding:8px 15px;
+
+    border:1px solid #d5dce1;
+
+    border-radius:30px;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+
+
+.safe-content h1{
+
+    margin:25px 0;
+
+    font-size:42px;
+
+    line-height:1.08;
+
+    letter-spacing:-1px;
+
+    color:var(--safe-black);
+
+}
+
+
+
+.safe-description{
+
+    font-size:17px;
+
+    line-height:1.7;
+
+    color:#64748b;
+
+}
+
+
+
+/* Rating */
+
+
+.reviews{
+
+    margin:20px 0;
+
+}
+
+
+.reviews span{
+
+    color:#ffc400;
+
+    font-size:22px;
+
+}
+
+
+
+.reviews small{
+
+    color:#64748b;
+
+    margin-left:10px;
+
+}
+
+
+
+/* ===============================
+PRICE CARD
+================================ */
+
+
+ /* =====================================
+SAFE ESCAPE INVESTMENT BOX
+===================================== */
+
+.investment-box{
+
+    margin-top:30px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #fff9df,
+        #fff4bf
+    );
+
+    border:1px solid #f1d36a;
+
+    border-radius:24px;
+
+    padding:32px 35px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:35px;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+
+/* Premium glow */
+
+.investment-box::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:180px;
+
+    height:180px;
+
+    background:#ffc400;
+
+    opacity:.12;
+
+    border-radius:50%;
+
+    right:-60px;
+
+    top:-60px;
+
+}
+
+
+
+
+
+/* LEFT PRICE AREA */
+
+.investment-box small{
+
+    display:block;
+
+    color:#64748b;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
+
+    margin-bottom:8px;
+
+}
+
+
+
+.investment-box h2{
+
+    margin:0;
+
+    font-size:48px;
+
+    line-height:1;
+
+    font-weight:900;
+
+    color:#071923;
+
+    letter-spacing:-1px;
+
+}
+
+
+
+
+
+/* FEATURE LIST */
+
+.investment-box ul{
+
+    margin:0;
+
+    padding:0;
+
+    list-style:none;
+
+}
+
+
+
+.investment-box li{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin:10px 0;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#10212b;
+
+}
+
+
+
+/* Green tick */
+
+.investment-box li::first-letter{
+
+    color:#16a34a;
+
+}
+
+
+
+
+
+
+/* HOVER EFFECT */
+
+.investment-box:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+
+    0 20px 40px rgba(0,0,0,.08);
+
+    transition:.3s ease;
+
+}
+
+
+
+
+
+/* =====================================
+TABLET
+===================================== */
+
+@media(max-width:900px){
+
+
+.investment-box{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    padding:28px;
+
+}
+
+
+
+.investment-box h2{
+
+    font-size:40px;
+
+}
+
+
+}
+
+
+
+
+/* =====================================
+MOBILE
+===================================== */
+
+@media(max-width:600px){
+
+
+.investment-box{
+
+    padding:22px;
+
+    border-radius:18px;
+
+}
+
+
+
+.investment-box h2{
+
+    font-size:34px;
+
+}
+
+
+
+.investment-box li{
+
+    font-size:13px;
+
+}
+
+
+}
+
+
+/* ===============================
+FLOOR SECTION
+================================ */
+
+
+.floor-box{
+
+    margin-top:25px;
+
+}
+
+
+
+.floor-box label{
+
+    display:block;
+
+    font-size:12px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.floor-box select{
+
+    width:100%;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    border:1px solid #ddd;
+
+    font-size:16px;
+
+}
+
+
+
+/* Length Price */
+
+
+.readout{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    margin-top:20px;
+
+    border:1px solid #ddd;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+}
+
+
+
+.readout div{
+
+    padding:22px;
+
+}
+
+
+
+.readout div+div{
+
+    border-left:1px solid #ddd;
+
+}
+
+
+
+.readout span{
+
+    display:block;
+
+    color:#64748b;
+
+    font-size:13px;
+
+}
+
+
+
+.readout strong{
+
+    display:block;
+
+    margin-top:8px;
+
+    font-size:24px;
+
+}
+
+
+
+/* ===============================
+PURCHASE BUTTONS
+================================ */
+
+
+.buy-area{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:30px;
+
+}
+
+
+
+.qty-box{
+
+    height:62px;
+
+    display:flex;
+
+    align-items:center;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+}
+
+
+
+.qty-box button{
+
+    width:45px;
+
+    height:100%;
+
+    border:none;
+
+    background:#f8fafc;
+
+    font-size:22px;
+
+}
+
+
+
+.qty-box span{
+
+    width:45px;
+
+    text-align:center;
+
+    font-weight:700;
+
+}
+
+
+
+.cart-btn{
+
+    background:var(--safe-black);
+
+    color:white;
+
+    border:none;
+
+    padding:0 35px;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    font-weight:800;
+
+}
+
+
+
+.buy-btn{
+
+    background:var(--safe-yellow);
+
+    border:none;
+
+    padding:12px 35px;
+
+    border-radius:12px;
+
+    font-weight:900;
+
+}
+
+
+
+.buy-btn small{
+
+    display:block;
+
+    font-size:11px;
+
+}
+
+
+
+/* ===============================
+TRUST BOX
+================================ */
+
+
+.trust-box{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:15px;
+
+    margin-top:35px;
+
+}
+
+
+
+.trust-box div{
+
+    border-top:1px solid #ddd;
+
+    padding-top:18px;
+
+    font-weight:700;
+
+}
+
+
+
+.trust-box p{
+
+    color:#64748b;
+
+    font-size:13px;
+
+    margin:5px 0;
+
+}
+
+
+
+/* ===============================
+BOTTOM SECTION
+ACCESSORIES + SUMMARY
+================================ */
+
+
+.bottom-layout{
+
+    width:min(1250px,92%);
+
+    margin:70px auto;
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:35px;
+
+}
+
+
+
+/* Accessories */
+
+
+.accessories h2{
+
+    font-size:32px;
+
+}
+
+
+
+.accessory-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+}
+
+
+
+.accessory-card{
+
+    border:1px solid #ddd;
+
+    border-radius:18px;
+
+    padding:15px;
+
+    display:grid;
+
+    grid-template-columns:80px 1fr;
+
+    gap:15px;
+
+    align-items:center;
+
+}
+
+
+
+.accessory-card:hover{
+
+    border-color:var(--safe-yellow);
+
+}
+
+
+
+.accessory-card.selected{
+
+    border:2px solid var(--safe-yellow);
+
+    background:#fffbea;
+
+}
+
+
+
+.accessory-img{
+
+    width:75px;
+
+    height:75px;
+
+    background:#f3f5f6;
+
+    border-radius:12px;
+
+}
+
+
+
+.accessory-card button{
+
+    background:none;
+
+    border:none;
+
+    color:var(--safe-red);
+
+    font-weight:800;
+
+}
+
+
+
+/* ===============================
+ORDER SUMMARY
+================================ */
+
+
+.summary-box{
+
+    background:var(--safe-black);
+
+    color:white;
+
+    padding:35px;
+
+    border-radius:25px;
+
+}
+
+
+
+.summary-box h2{
+
+    margin-top:0;
+
+}
+
+
+
+.summary-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:15px 0;
+
+    border-bottom:1px solid #30414b;
+
+}
+
+
+
+.summary-total{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center; 
+
+}
+
+
+
+.summary-total strong{
+
+    font-size:34px;
+
+}
+
+
+
+.summary-box button{
+
+    width:100%;
+
+    padding:16px;
+
+    margin-top:12px;
+
+    border:none;
+
+    font-weight:800;
+
+}
+
+
+
+.summary-box .buy{
+
+    background:var(--safe-yellow);
+
+}
+
+
+
+/* =====================================
+SAFE ESCAPE CART POPUP
+PREMIUM ECOMMERCE STYLE
+===================================== */
+
+
+.cart-popup{
+
+position:fixed;
+
+inset:0;
+
+background:rgba(7,25,35,.75);
+
+backdrop-filter:blur(6px);
+
+display:none;
+
+align-items:center;
+
+justify-content:center;
+
+z-index:9999;
+
+padding:20px;
+
+}
+
+
+
+.cart-popup.active{
+
+display:flex;
+
+}
+
+
+
+
+
+.cart-popup-box{
+
+
+width:min(480px,100%);
+
+background:#fff;
+
+border-radius:28px;
+
+padding:40px;
+
+position:relative;
+
+text-align:center;
+
+box-shadow:
+
+0 30px 80px rgba(0,0,0,.25);
+
+
+animation:popupShow .35s ease;
+
+
+}
+
+
+
+@keyframes popupShow{
+
+
+from{
+
+opacity:0;
+
+transform:translateY(30px) scale(.95);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+
+}
+
+
+
+
+
+/* CLOSE */
+
+.popup-close{
+
+
+position:absolute;
+
+right:20px;
+
+top:20px;
+
+
+width:38px;
+
+height:38px;
+
+
+border-radius:50%;
+
+
+border:1px solid #ddd;
+
+
+background:#fff;
+
+
+font-size:24px;
+
+
+cursor:pointer;
+
+
+}
+
+
+
+
+
+.popup-close:hover{
+
+background:#071923;
+
+color:#fff;
+
+}
+
+
+
+
+
+
+
+/* SUCCESS ICON */
+
+
+.success-icon{
+
+
+width:70px;
+
+height:70px;
+
+
+margin:auto;
+
+
+border-radius:50%;
+
+
+background:#12b886;
+
+
+color:#fff;
+
+
+font-size:38px;
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+font-weight:900;
+
+
+}
+
+
+
+
+
+.cart-popup-box h2{
+
+
+font-size:28px;
+
+color:#071923;
+
+margin:25px 0 10px;
+
+
+}
+
+
+
+.popup-subtitle{
+
+
+color:#64748b;
+
+font-size:15px;
+
+line-height:1.6;
+
+
+}
+
+
+
+
+
+/* PRODUCT DETAILS */
+
+
+.popup-product{
+
+
+margin:25px 0;
+
+
+background:#f8fafc;
+
+
+border:1px solid #e5e7eb;
+
+
+border-radius:18px;
+
+
+overflow:hidden;
+
+
+}
+
+
+
+.popup-product div{
+
+
+display:flex;
+
+justify-content:space-between;
+
+
+padding:15px 20px;
+
+
+border-bottom:1px solid #e5e7eb;
+
+
+}
+
+
+
+.popup-product div:last-child{
+
+border-bottom:none;
+
+}
+
+
+
+.popup-product span{
+
+
+color:#64748b;
+
+font-size:14px;
+
+
+}
+
+
+
+.popup-product strong{
+
+
+color:#071923;
+
+}
+
+
+
+
+
+/* BUTTONS */
+
+
+.popup-actions{
+
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:15px;
+
+
+}
+
+
+
+.continue-btn{
+
+
+height:55px;
+
+
+border:1px solid #071923;
+
+
+background:#fff;
+
+
+color:#071923;
+
+
+font-weight:800;
+
+
+border-radius:12px;
+
+
+cursor:pointer;
+
+
+}
+
+
+
+.popup-buy-btn{
+
+
+height:55px;
+
+
+border:none;
+
+
+background:#ffc400;
+
+
+color:#071923;
+
+
+font-weight:900;
+
+
+border-radius:12px;
+
+
+cursor:pointer;
+
+
+}
+
+
+
+.popup-buy-btn:hover{
+
+
+background:#ffb900;
+
+
+}
+
+
+
+
+
+@media(max-width:600px){
+
+
+.cart-popup-box{
+
+padding:30px 20px;
+
+}
+
+
+
+.popup-actions{
+
+grid-template-columns:1fr;
+
+}
+
+
+
+.cart-popup-box h2{
+
+font-size:23px;
+
+}
+
+
+}
+
+
+
+/* ===============================
+RESPONSIVE
+================================ */
+
+
+@media(max-width:900px){
+
+
+.safe-container{
+
+    grid-template-columns:1fr;
+
+}
+
+
+.gallery{
+
+    position:relative;
+
+    top:0;
+
+}
+
+
+
+.safe-content h1{
+
+    font-size:32px;
+
+}
+
+
+
+.investment-box{
+
+    flex-direction:column;
+
+}
+
+
+
+.buy-area{
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.cart-btn,
+.buy-btn{
+
+    width:100%;
+
+}
+
+
+
+.bottom-layout{
+
+    grid-template-columns:1fr;
+
+}
+
+
+
+.accessory-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+
+
+.trust-box{
+
+    grid-template-columns:1fr;
+
+}
+
+
+}
+
+/* =====================================
+SAFE ESCAPE INCLUDED SECTION
+INDUSTRIAL PREMIUM STYLE
+===================================== */
+
+
+.included-section{
+
+padding:0px 0px 20px 0px;
+background:#fff;
+
+}
+
+
+.included-wrap{
+
+width:min(1200px,92%);
+margin:auto;
+
+display:grid;
+grid-template-columns:1fr 1fr;
+
+gap:80px;
+
+}
+
+
+
+/* LEFT */
+
+
+.small-heading{
+
+font-size:12px;
+font-weight:800;
+letter-spacing:2px;
+color:#ed3124;
+
+margin-bottom:20px;
+
+}
+
+
+
+.installation-block h2,
+.included-block h2{
+
+font-size:36px;
+line-height:1.15;
+color:#071923;
+
+margin:0 0 25px;
+
+letter-spacing:-.5px;
+
+}
+
+
+
+.installation-block p{
+
+font-size:16px;
+line-height:1.8;
+color:#5f6d78;
+
+margin-bottom:18px;
+
+}
+
+
+
+
+.technical-points{
+
+margin-top:35px;
+
+border-top:1px solid #e5e7eb;
+
+}
+
+
+
+.technical-points div{
+
+display:flex;
+align-items:center;
+
+gap:20px;
+
+padding:18px 0;
+
+border-bottom:1px solid #e5e7eb;
+
+font-weight:700;
+
+color:#071923;
+
+}
+
+
+
+.technical-points span{
+
+font-size:13px;
+color:#ed3124;
+font-weight:900;
+
+}
+
+
+
+
+
+/* RIGHT */
+
+
+.included-block{
+
+border-left:1px solid #e5e7eb;
+
+padding-left:50px;
+
+}
+
+
+
+.included-list{
+
+border-top:1px solid #e5e7eb;
+
+}
+
+
+
+.included-list div{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+padding:20px 0;
+
+border-bottom:1px solid #e5e7eb;
+
+font-size:16px;
+
+font-weight:700;
+
+color:#071923;
+
+}
+
+
+
+.included-list span{
+
+color:#12b886;
+
+font-size:20px;
+
+font-weight:900;
+
+}
+
+
+
+
+.included-list div:hover{
+
+padding-left:10px;
+
+transition:.3s;
+
+}
+
+
+
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+
+.included-wrap{
+
+grid-template-columns:1fr;
+
+gap:40px;
+
+}
+
+
+
+.included-block{
+
+border-left:none;
+
+border-top:1px solid #e5e7eb;
+
+padding-left:0;
+
+padding-top:40px;
+
+}
+
+
+.installation-block h2,
+.included-block h2{
+
+font-size:28px;
+
+}
+
+
+}
+
+/* =====================================================
+SAFE ESCAPE GLOBAL RESPONSIVE PATCH
+===================================================== */
+
+html, body { overflow-x: hidden; }
+
+.container, .shell, .wrap, main, section {
+    max-width: 100%;
+}
+
+img, video, iframe, canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+}
+
+.grid, .cards, .card-grid, .steps-grid, .product-grid, 
+.gallery-grid, .resource-grid, .feature-grid {
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .hero, .hero-grid, .two-col, .split, .about-grid,
+    .product-layout, .contact-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    h1 { font-size: clamp(32px, 6vw, 54px); }
+    h2 { font-size: clamp(26px, 5vw, 40px); }
+}
+
+@media (max-width: 768px) {
+
+    .shell, .container {
+        width: calc(100% - 32px) !important;
+        margin: auto;
+    }
+
+    section {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .nav-links,
+    .menu,
+    .desktop-menu {
+        display: none !important;
+    }
+
+    .steps-grid,
+    .card-grid,
+    .product-grid,
+    .gallery-grid,
+    .resource-grid,
+    .feature-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero,
+    .page-hero,
+    .policy-hero {
+        min-height: auto;
+        padding-top: 70px;
+        padding-bottom: 70px;
+    }
+
+    .btn, button {
+        max-width: 100%;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .modal,
+    .video-modal {
+        padding: 15px;
+    }
+
+    .video-box {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    h1 { font-size: 30px !important; }
+    h2 { font-size: 24px !important; }
+    h3 { font-size: 20px !important; }
+
+    p, li {
+        font-size: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   5 YEARS WARRANTY - PRODUCT PAGE
+========================================================= */
+
+.product-warranty-card {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 18px;
+    padding: 17px 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    position: relative;
+    overflow: hidden;
+
+    background: linear-gradient(
+        110deg,
+        #fff8df 0%,
+        #fffdf6 55%,
+        #fff2bd 100%
+    );
+
+    border: 1px solid #ead183;
+    border-radius: 14px;
+
+    box-shadow: 0 8px 24px rgba(15, 28, 43, 0.08);
+}
+
+
+/* GOLD LEFT LINE */
+
+.product-warranty-card::before {
+    content: "";
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 5px;
+
+    background: linear-gradient(
+        180deg,
+        #c99500,
+        #f3ca43,
+        #ad7c00
+    );
+}
+
+
+/* ICON */
+
+.product-warranty-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #101d2b;
+    border-radius: 50%;
+
+    box-shadow: 0 5px 14px rgba(16, 29, 43, 0.18);
+}
+
+.product-warranty-icon span {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid #f2c94c;
+    border-radius: 50%;
+
+    color: #f2c94c;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+/* INFORMATION */
+
+.product-warranty-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-warranty-label {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #a47700;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+}
+
+.product-warranty-info h3 {
+    margin: 0;
+
+    color: #101d2b;
+
+    font-size: 19px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.product-warranty-info h3 strong {
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.product-warranty-info h3 sup {
+    font-size: 10px;
+    position: relative;
+    top: -5px;
+}
+
+.product-warranty-info p {
+    margin: 5px 0 0;
+
+    color: #606a73;
+
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+/* 5 YEARS RIGHT BADGE */
+
+.product-warranty-badge {
+    min-width: 64px;
+
+    padding-left: 15px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border-left: 1px solid rgba(168, 126, 0, 0.22);
+}
+
+.product-warranty-badge strong {
+    color: #101d2b;
+
+    font-size: 31px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.product-warranty-badge span {
+    margin-top: 3px;
+
+    color: #a87c00;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 1.3px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .product-warranty-card {
+        margin-top: 15px;
+        padding: 14px 13px;
+        gap: 11px;
+    }
+
+    .product-warranty-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+    }
+
+    .product-warranty-icon span {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+
+    .product-warranty-info h3 {
+        font-size: 16px;
+    }
+
+    .product-warranty-info h3 strong {
+        font-size: 19px;
+    }
+
+    .product-warranty-info p {
+        font-size: 10px;
+    }
+
+    .product-warranty-badge {
+        min-width: 48px;
+        padding-left: 9px;
+    }
+
+    .product-warranty-badge strong {
+        font-size: 26px;
+    }
+
+    .product-warranty-badge span {
+        font-size: 8px;
+    }
+}
+
+.video-thumb {
+    width: 88px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: #fff;
+}
+
+.video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    padding-left: 2px;
+}
+.youtube-thumb {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.youtube-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.youtube-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+
+    border-radius: 50%;
+    font-size: 13px;
+    padding-left: 2px;
+}
+/* =====================================================
+   YOUTUBE VIDEO THUMBNAIL
+===================================================== */
+
+.youtube-thumb {
+    position: relative;
+    width: 90px;
+    height: 80px;
+    flex: 0 0 90px;
+
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid #ddd;
+
+    cursor: pointer;
+    background: #000;
+}
+
+.youtube-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.youtube-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+
+    font-size: 14px;
+    line-height: 1;
+
+    padding-left: 2px;
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   YOUTUBE VIDEO MODAL
+===================================================== */
+
+.video-modal {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    display: none !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 30px !important;
+
+    background: rgba(0, 0, 0, 0.82) !important;
+    backdrop-filter: blur(7px);
+
+    z-index: 999999 !important;
+
+    box-sizing: border-box;
+}
+
+
+/* OPEN */
+
+.video-modal.active {
+    display: flex !important;
+}
+
+
+/* =====================================================
+   VIDEO BOX
+===================================================== */
+
+.video-modal .video-box {
+    position: relative !important;
+
+    width: min(850px, 90vw) !important;
+
+    aspect-ratio: 16 / 9 !important;
+
+    height: auto !important;
+    max-height: 80vh !important;
+
+    margin: auto !important;
+
+    background: #000 !important;
+
+    border-radius: 16px !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        0 25px 70px
+        rgba(0, 0, 0, 0.45) !important;
+}
+
+
+/* =====================================================
+   YOUTUBE IFRAME
+===================================================== */
+
+.video-modal .video-box iframe {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    aspect-ratio: auto !important;
+
+    display: block !important;
+
+    border: 0 !important;
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+===================================================== */
+
+.video-modal .close-video {
+    position: absolute !important;
+
+    top: 12px !important;
+    right: 12px !important;
+
+    width: 42px !important;
+    height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+
+    border: 1px solid rgba(255,255,255,.25) !important;
+    border-radius: 50% !important;
+
+    background: rgba(0,0,0,.75) !important;
+    color: #fff !important;
+
+    font-size: 19px !important;
+    line-height: 1 !important;
+
+    cursor: pointer !important;
+
+    z-index: 20 !important;
+}
+
+.video-modal .close-video:hover {
+    background: #ed3124 !important;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .video-modal {
+        padding: 20px !important;
+    }
+
+    .video-modal .video-box {
+        width: 92vw !important;
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .video-modal {
+        padding: 12px !important;
+    }
+
+    .video-modal .video-box {
+        width: 100% !important;
+        border-radius: 10px !important;
+    }
+
+    .video-modal .close-video {
+        width: 36px !important;
+        height: 36px !important;
+
+        top: 8px !important;
+        right: 8px !important;
+
+        font-size: 16px !important;
+    }
+
+}

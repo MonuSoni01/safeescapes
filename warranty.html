@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/images/favicon.png">
+
+    <title>
+        Warranty Registration | SAFE ESCAPE
+    </title>
+
+    <meta name="description"
+        content="Register your SAFE ESCAPE installation to submit product and installation details for warranty activation review.">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+
+    <style>
+        /* =========================================================
+           WARRANTY HERO
+        ========================================================= */
+
+        .warranty-hero-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.15fr) minmax(300px, .85fr);
+
+            gap: 70px;
+
+            align-items: center;
+
+        }
+
+
+        /* =========================================================
+           WARRANTY HIGHLIGHT BOX
+        ========================================================= */
+
+        .warranty-highlight {
+
+            position: relative;
+
+            padding: 30px;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 196, 0, .14),
+                    rgba(255, 255, 255, .04));
+
+            border:
+                1px solid rgba(255, 196, 0, .35);
+
+            border-left:
+                5px solid #ffc400;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+        }
+
+
+        .warranty-highlight::after {
+
+            content: "5";
+
+            position: absolute;
+
+            right: -5px;
+
+            bottom: -60px;
+
+            color:
+                rgba(255, 255, 255, .035);
+
+            font-size: 190px;
+
+            font-weight: 900;
+
+            line-height: 1;
+
+        }
+
+
+        .warranty-highlight__badge {
+
+            display: inline-flex;
+
+            padding: 6px 11px;
+
+            margin-bottom: 14px;
+
+            border-radius: 999px;
+
+            background: #ffc400;
+
+            color: #08121b;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.2px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .warranty-highlight h2 {
+
+            position: relative;
+
+            z-index: 2;
+
+            margin: 0 0 10px;
+
+            color: #fff;
+
+            font-size: 30px;
+
+            line-height: 1.15;
+
+        }
+
+
+        .warranty-highlight h2 strong {
+
+            color: #ffc400;
+
+        }
+
+
+        .warranty-highlight p {
+
+            position: relative;
+
+            z-index: 2;
+
+            margin: 0;
+
+            color: #c5ced4;
+
+            font-size: 15px;
+
+            line-height: 1.7;
+
+        }
+
+
+        .warranty-highlight__deadline {
+
+            position: relative;
+
+            z-index: 2;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 18px;
+
+            padding-top: 16px;
+
+            border-top:
+                1px solid rgba(255, 255, 255, .10);
+
+            color: #fff;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =========================================================
+           WARRANTY FORM WRAPPER
+        ========================================================= */
+
+        .warranty-form-wrap {
+
+            max-width: 900px;
+
+            margin: auto;
+
+        }
+
+
+        .warranty-form-wrap h2 {
+
+            margin-top: 42px;
+
+            margin-bottom: 12px;
+
+            font-size: 25px;
+
+        }
+
+
+        .warranty-form-wrap h2:first-of-type {
+
+            margin-top: 0;
+
+        }
+
+
+        /* =========================================================
+           ERROR BOX
+        ========================================================= */
+
+        .warranty-error {
+
+            display: none;
+
+            margin-bottom: 28px;
+
+            padding: 18px 20px;
+
+            background: #fff1f0;
+
+            color: #9f1c16;
+
+            border: 1px solid #f1b4af;
+
+            border-left: 5px solid #ee372f;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            line-height: 1.6;
+
+        }
+
+
+        .warranty-error.show {
+
+            display: block;
+
+        }
+
+
+        .warranty-error strong {
+
+            display: block;
+
+            margin-bottom: 3px;
+
+            color: #cf2d27;
+
+            font-size: 16px;
+
+        }
+
+
+        /* =========================================================
+           SELECT
+        ========================================================= */
+
+        .field select {
+
+            width: 100%;
+
+            padding: 15px 16px;
+
+            border: 1px solid #cfd7dc;
+
+            background: #fff;
+
+            color: #08121b;
+
+            outline: none;
+
+        }
+
+
+        .field select:focus {
+
+            border-color: #08121b;
+
+        }
+
+
+        /* =========================================================
+           PHOTO HELP
+        ========================================================= */
+
+        .field-help {
+
+            display: block;
+
+            margin-top: 7px;
+
+            color: #667584;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* =========================================================
+           TERMS BOX
+        ========================================================= */
+
+        .warranty-terms {
+
+            margin: 28px 0;
+
+            padding: 18px;
+
+            background: #f7f8f8;
+
+            border: 1px solid #dce2e6;
+
+        }
+
+
+        .warranty-terms label {
+
+            display: grid;
+
+            grid-template-columns: 20px 1fr;
+
+            gap: 11px;
+
+            align-items: start;
+
+            margin: 0;
+
+            font-size: 13px;
+
+            line-height: 1.65;
+
+            cursor: pointer;
+
+        }
+
+
+        .warranty-terms input {
+
+            width: 17px;
+
+            height: 17px;
+
+            margin-top: 3px;
+
+            accent-color: #ee372f;
+
+        }
+
+
+        .warranty-terms a {
+
+            color: #175db5;
+
+            text-decoration: underline;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =========================================================
+           FORM ACTIONS
+        ========================================================= */
+
+        .warranty-actions {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media(max-width:900px) {
+
+            .warranty-hero-grid {
+
+                grid-template-columns: 1fr;
+
+                gap: 35px;
+
+            }
+
+        }
+
+
+        @media(max-width:680px) {
+
+            .warranty-highlight {
+
+                padding: 22px;
+
+            }
+
+
+            .warranty-highlight h2 {
+
+                font-size: 25px;
+
+            }
+
+
+            .warranty-actions {
+
+                flex-direction: column;
+
+            }
+
+
+            .warranty-actions .btn {
+
+                width: 100%;
+
+            }
+
+        }
+        /* =========================================
+   WARRANTY HERO FIX
+========================================= */
+
+.warranty-hero-grid {
+    grid-template-columns: minmax(0, 1fr) 500px;
+    gap: 70px;
+    align-items: center;
+}
+
+.warranty-highlight {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: block !important;
+
+    padding: 34px 36px;
+}
+
+.warranty-highlight__badge {
+    display: inline-flex;
+    width: auto;
+}
+
+.warranty-highlight h2 {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 14px;
+}
+
+.warranty-highlight p {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.warranty-highlight__deadline {
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+    .warranty-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+    .warranty-highlight {
+        width: 100%;
+    }
+}
+    </style>
+
+</head>
+
+
+
+<body data-page="warranty">
+
+
+    <div id="siteHeader"></div>
+
+
+
+    <main>
+
+
+        <!-- =====================================================
+        HERO
+        ====================================================== -->
+
+        <section class="page-hero">
+
+
+            <div class="shell warranty-hero-grid">
+
+
+                <!-- LEFT -->
+
+                <div>
+
+
+                    <p class="kicker">
+                        Warranty Registration
+                    </p>
+
+
+                    <h1>
+                        Register your installed SAFE ESCAPE.
+                    </h1>
+
+
+                    <p>
+
+                        Complete the product and installation details,
+                        then upload a clear photograph of the installed
+                        SAFE ESCAPE device.
+
+                    </p>
+
+
+                </div>
+
+
+
+                <!-- RIGHT HIGHLIGHT -->
+
+                <aside class="warranty-highlight">
+
+
+                    <span class="warranty-highlight__badge">
+                        Warranty Activation
+                    </span>
+
+
+                    <h2>
+
+                        Enjoy a
+                        <strong>
+                            5-Year Warranty
+                        </strong>
+
+                    </h2>
+
+
+                    <p>
+
+                        Register your SAFE ESCAPE product within
+                        <strong style="color:#fff">
+                            15 days of installation
+                        </strong>
+                        to activate your warranty registration.
+
+                    </p>
+
+
+                    <div class="warranty-highlight__deadline">
+
+                        ⏱ Registration deadline:
+                        15 calendar days from installation
+
+                    </div>
+
+
+                </aside>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+        FORM
+        ====================================================== -->
+
+        <section class="section">
+
+
+            <div class="shell warranty-form-wrap">
+
+
+                <!-- =================================================
+                EXPIRY ERROR
+                ================================================== -->
+
+                <div id="warrantyError" class="warranty-error" role="alert" aria-live="assertive">
+
+                    <strong>
+                        Warranty Registration Period Expired
+                    </strong>
+
+                    <span id="warrantyErrorText">
+
+                        We are sorry, but you cannot register your warranty
+                        anymore because the time limit has expired.
+
+                    </span>
+
+                </div>
+
+
+
+                <form id="warrantyForm" data-sheet-form="warranty">
+
+
+                    <!-- =================================================
+                    CUSTOMER DETAILS
+                    ================================================== -->
+
+                    <h2>
+                        Customer Details
+                    </h2>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="field">
+
+                            <label>
+                                Customer / Company Name
+                            </label>
+
+                            <input name="customerName" required>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Mobile Number
+                            </label>
+
+                            <input name="mobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
+                                required>
+
+                        </div>
+
+
+
+                        <div class="field full">
+
+                            <label>
+                                Email Address
+                            </label>
+
+                            <input type="email" name="email" required>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                    PRODUCT DETAILS
+                    ================================================== -->
+
+                    <h2>
+                        Product Details
+                    </h2>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="field">
+
+                            <label>
+                                Device Serial Number
+                            </label>
+
+                            <input name="serialNumber" required>
+
+                        </div>
+
+
+
+                        <!-- WIRE LENGTH DROPDOWN -->
+
+                        <div class="field">
+
+                            <label for="wireLength">
+                                Length of Wire (Metres)
+                            </label>
+
+
+                            <select id="wireLength" name="wireLength" required>
+
+                                <option value="">
+                                    Select Wire Length
+                                </option>
+
+                                <option value="15">
+                                    15 Metres
+                                </option>
+
+                                <option value="20">
+                                    20 Metres
+                                </option>
+
+                                <option value="25">
+                                    25 Metres
+                                </option>
+
+                                <option value="30">
+                                    30 Metres
+                                </option>
+
+                                <option value="35">
+                                    35 Metres
+                                </option>
+
+                                <option value="40">
+                                    40 Metres
+                                </option>
+
+                                <option value="45">
+                                    45 Metres
+                                </option>
+
+                                <option value="50">
+                                    50 Metres
+                                </option>
+
+                                <option value="55">
+                                    55 Metres
+                                </option>
+
+                                <option value="60">
+                                    60 Metres
+                                </option>
+
+                                <option value="65">
+                                    65 Metres
+                                </option>
+
+                                <option value="70">
+                                    70 Metres
+                                </option>
+
+                                <option value="75">
+                                    75 Metres
+                                </option>
+
+                                <option value="80">
+                                    80 Metres
+                                </option>
+
+                                <option value="85">
+                                    85 Metres
+                                </option>
+
+                                <option value="90">
+                                    90 Metres
+                                </option>
+
+                                <option value="95">
+                                    95 Metres
+                                </option>
+
+                                <option value="100">
+                                    100 Metres
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="field full">
+
+                            <label>
+                                Purchased From
+                            </label>
+
+                            <input name="purchasedFrom" required>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                    INSTALLATION DETAILS
+                    ================================================== -->
+
+                    <h2>
+                        Installation Details
+                    </h2>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="field full">
+
+                            <label>
+                                Installation Address incl. Floor
+                            </label>
+
+
+                            <textarea name="installationAddress" rows="4" required></textarea>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Installation Date
+                            </label>
+
+
+                            <input id="installationDate" type="date" name="installationDate" required>
+
+
+                            <small class="field-help">
+
+                                Warranty registration must be completed within
+                                15 calendar days of installation.
+
+                            </small>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Installed By
+                            </label>
+
+                            <input name="installedBy" required>
+
+                        </div>
+
+
+
+                        <!-- PHOTO -->
+
+                        <div class="field full">
+
+                            <label>
+                                Installed Device Photo/ Serial Number Photo
+                            </label>
+
+
+                            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required>
+
+
+                            <small class="field-help">
+
+                                Upload one clear photograph showing the
+                                installed SAFE ESCAPE device.
+
+                            </small>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                    TERMS
+                    ================================================== -->
+
+                    <div class="warranty-terms">
+
+
+                        <label>
+
+
+                            <input type="checkbox" name="termsAccepted" value="yes" required>
+
+
+                            <span>
+
+                                I hereby confirm that I have reviewed,
+                                understood, and agreed to abide by the official
+
+                                <a href="terms.html" target="_blank" rel="noopener">
+                                    Product Registration and Warranty Activation
+                                    Terms and Conditions
+                                </a>.
+
+                                By ticking this box, I execute a binding
+                                electronic contract and accept the product
+                                SAFE ESCAPE - YOUR RESCUE PARTNER™ strictly
+                                under these terms.
+
+                            </span>
+
+
+                        </label>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                    ACTIONS
+                    ================================================== -->
+
+                    <div class="warranty-actions">
+
+
+                        <button class="btn" type="submit">
+                            Submit Registration →
+                        </button>
+
+
+                        <button class="btn btn-dark" type="reset">
+                            Reset
+                        </button>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <div id="siteFooter"></div>
+
+
+    <script src="assets/js/components.js"></script>
+
+    <script type="module" src="assets/js/warranty.js"></script>
+    <script type="module" src="assets/js/form.js"></script>
+
+
+</body>
+
+</html>

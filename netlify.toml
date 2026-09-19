@@ -1,0 +1,14 @@
+[build]
+  publish = "."
+  functions = "functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
+[dev]
+  publish = "."
+  functions = "functions"
+  port = 8888

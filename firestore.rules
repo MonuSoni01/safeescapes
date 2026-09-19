@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() { return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    match /admins/{uid} { allow read: if request.auth != null && request.auth.uid == uid; allow write: if false; }
+    match /enquiries/{id} { allow create: if request.resource.data.name is string && request.resource.data.name.size() <= 120 && request.resource.data.mobile is string && request.resource.data.mobile.size() <= 20 && request.resource.data.keys().hasOnly(['name','mobile','email','subject','message','createdAt','status']); allow read, update, delete: if isAdmin(); }
+    match /warrantyRegistrations/{id} { allow create: if request.resource.data.customerName is string && request.resource.data.customerName.size() <= 120 && request.resource.data.serialNumber is string && request.resource.data.serialNumber.size() <= 80 && request.resource.data.keys().hasOnly(['customerName','mobile','email','serialNumber','wireLength','purchasedFrom','installationAddress','installationDate','installedBy','termsAccepted','photoPath','createdAt','status']); allow read, update, delete: if isAdmin(); }
+    match /orders/{id} { allow read, update, delete: if isAdmin(); allow create: if false; }
+    match /coupons/{id} { allow read, create, update, delete: if isAdmin(); }
+  }
+}

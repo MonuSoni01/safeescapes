@@ -1,0 +1,297 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SAFE ESCAPE Admin Dashboard</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/images/favicon.png">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+
+<body class="admin-page">
+
+  <!-- LOGIN -->
+  <section class="login-screen" id="adminLogin">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
+      </div>
+
+      <h1>Welcome back.</h1>
+      <p class="login-text">
+        Sign in to manage orders, customer requests, warranty registrations and offers.
+      </p>
+
+      <p id="configWarning" hidden class="notice">
+        Add Firebase configuration in <b>assets/js/firebase-config.js</b>.
+      </p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="admin@safeescape.com" required>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <div class="login-options">
+          <label class="remember-login">
+            <input type="checkbox">
+            <span>Keep me signed in</span>
+          </label>
+
+          <button type="button" id="forgotPasswordBtn" class="forgot-password">
+            Forgot password?
+          </button>
+        </div>
+
+        <button class="btn login-button" type="submit">
+          LOGIN TO DASHBOARD <span>→</span>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <div class="login-secure">
+          <span>✓</span> Secure administrative access
+        </div>
+
+        <p>
+          Design &amp; Developed by
+          <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">
+            Rank Chahiye
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <div class="admin-layout" id="adminPanel" hidden>
+
+    <aside class="sidebar">
+      <a href="../index.html" class="brand">
+        <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
+      </a>
+
+      <p class="nav-label">OPERATIONS</p>
+
+      <nav class="side-nav">
+        <button class="active" data-admin-tab="orders">
+          <span class="nav-icon">◫</span>
+          <span>Orders</span>
+        </button>
+
+        <button data-admin-tab="enquiries">
+          <span class="nav-icon">◎</span>
+          <span>Enquiries</span>
+        </button>
+
+        <button data-admin-tab="warranty">
+          <span class="nav-icon">✓</span>
+          <span>Warranty</span>
+        </button>
+
+        <button data-admin-tab="coupons">
+          <span class="nav-icon">%</span>
+          <span>Coupons</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="admin-initial">SE</div>
+
+        <div class="admin-user">
+          <b id="adminEmail">Admin</b>
+          <small>Authorized User</small>
+        </div>
+
+        <button id="logoutBtn" class="logout-button" title="Logout">↗</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="dashboard-header">
+        <div>
+          <p class="mini-title" id="dashboardKicker">ORDER MANAGEMENT</p>
+          <h1 id="dashboardTitle">Orders Overview</h1>
+          <p id="dashboardDescription">
+            Track orders, payment status and fulfilment progress.
+          </p>
+        </div>
+
+        <div class="header-actions">
+          <a href="../index.html" target="_blank" class="view-site">
+            VIEW WEBSITE ↗
+          </a>
+
+          <span class="live-tag"><i></i> LIVE</span>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span>Total Orders</span>
+          <strong id="orderCount">—</strong>
+          <small>Latest order records</small>
+        </article>
+
+        <article class="stat-card">
+          <span>Enquiries</span>
+          <strong id="enquiryCount">—</strong>
+          <small>Contact, Dealer, Bulk & Referral</small>
+        </article>
+
+        <article class="stat-card">
+          <span>Warranty</span>
+          <strong id="warrantyCount">—</strong>
+          <small>Registration requests</small>
+        </article>
+
+        <article class="stat-card">
+          <span>Coupons</span>
+          <strong id="couponCount">—</strong>
+          <small>Saved promotional offers</small>
+        </article>
+      </section>
+
+      <!-- COUPON SECTION -->
+      <section id="couponManager" class="coupon-section" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="mini-title">DISCOUNT MANAGEMENT</p>
+            <h2>Create or Update Coupon</h2>
+            <p>Every coupon is securely verified before payment.</p>
+          </div>
+
+          <span class="secure-tag">● SERVER VERIFIED</span>
+        </div>
+
+        <form id="couponForm" class="coupon-form">
+          <div class="field">
+            <label>Coupon Code</label>
+            <input name="code" maxlength="30" placeholder="SAFE10" required>
+          </div>
+
+          <div class="field">
+            <label>Display Title</label>
+            <input name="title" placeholder="10% Launch Offer">
+          </div>
+
+          <div class="field">
+            <label>Discount Type</label>
+            <select name="discountType">
+              <option value="percent">Percentage (%)</option>
+              <option value="flat">Flat Amount (₹)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Discount Value</label>
+            <input name="discountValue" type="number" min="1" placeholder="10" required>
+          </div>
+
+          <div class="field">
+            <label>Minimum Order (₹)</label>
+            <input name="minOrder" type="number" min="0" value="0">
+          </div>
+
+          <div class="field">
+            <label>Maximum Discount (₹)</label>
+            <input name="maxDiscount" type="number" min="0" value="0">
+          </div>
+
+          <div class="field">
+            <label>Start Date</label>
+            <input name="startDate" type="date">
+          </div>
+
+          <div class="field">
+            <label>Expiry Date</label>
+            <input name="expiryDate" type="date">
+          </div>
+
+          <div class="field">
+            <label>Usage Limit <em>0 = unlimited</em></label>
+            <input name="usageLimit" type="number" min="0" value="0">
+          </div>
+
+          <label class="active-check">
+            <input name="active" type="checkbox" checked>
+            <span>
+              <b>Coupon is Active</b>
+              <small>Customers can use this code</small>
+            </span>
+          </label>
+
+          <button class="btn coupon-save" type="submit">
+            SAVE COUPON <span>→</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- RECORD TABLE -->
+      <section class="records-section">
+        <div class="records-heading">
+          <div>
+            <h2 id="recordsTitle">Recent Orders</h2>
+            <p id="recordsDescription">All records from your Firebase database.</p>
+          </div>
+
+          <span class="record-count" id="recordCount">LIVE DATA</span>
+        </div>
+
+        <div id="dataOut">
+          <div class="admin-loading">
+            <span></span> Loading dashboard data…
+          </div>
+        </div>
+      </section>
+
+      <footer class="dashboard-footer">
+        Design &amp; Developed by
+        <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">
+          Rank Chahiye
+        </a>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- DETAIL POPUP -->
+  <div class="detail-modal" id="detailModal" hidden>
+    <div class="detail-modal-box">
+      <div class="detail-modal-head">
+        <div>
+          <p class="mini-title">FORM DETAILS</p>
+          <h2 id="detailTitle">Submission Details</h2>
+        </div>
+
+        <button id="closeDetailModal" class="close-modal">×</button>
+      </div>
+
+      <div id="detailContent" class="detail-content"></div>
+    </div>
+  </div>
+
+  <script>
+    window.showToast = function (message) {
+      alert(message);
+    };
+  </script>
+
+  <script type="module" src="../assets/js/admin.js"></script>
+</body>
+
+</html>

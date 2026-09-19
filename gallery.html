@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Gallery | SAFE ESCAPE</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/images/favicon.png">
+
+    <meta name="description"
+        content="Explore SAFE ESCAPE product, installation, safety testing and project gallery.">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+
+    <style>
+        /* =========================================================
+           GALLERY
+        ========================================================= */
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+
+            transition:
+                transform .45s ease,
+                filter .45s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+
+        /* =========================================================
+           ZOOM ICON
+        ========================================================= */
+
+        .gallery-item::after {
+            content: "⌕";
+
+            position: absolute;
+            top: 16px;
+            right: 16px;
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(8, 18, 27, .85);
+            color: #fff;
+
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 50%;
+
+            font-size: 24px;
+
+            opacity: 0;
+            transform: translateY(-5px);
+
+            transition: .25s ease;
+
+            pointer-events: none;
+        }
+
+        .gallery-item:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* =========================================================
+           LIGHTBOX
+        ========================================================= */
+
+        .gallery-lightbox {
+            position: fixed;
+            inset: 0;
+
+            z-index: 999999;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 60px 100px;
+
+            background: rgba(0, 0, 0, .94);
+            backdrop-filter: blur(8px);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition:
+                opacity .25s ease,
+                visibility .25s ease;
+        }
+
+        .gallery-lightbox.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        /* =========================================================
+           IMAGE
+        ========================================================= */
+
+        .gallery-lightbox-image {
+            display: block;
+
+            max-width: 100%;
+            max-height: 85vh;
+
+            width: auto;
+            height: auto;
+
+            object-fit: contain;
+
+            box-shadow:
+                0 20px 70px rgba(0, 0, 0, .6);
+
+            transform: scale(.96);
+
+            transition: transform .3s ease;
+
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .gallery-lightbox.open
+        .gallery-lightbox-image {
+            transform: scale(1);
+        }
+
+
+        /* =========================================================
+           CLOSE
+        ========================================================= */
+
+        .gallery-lightbox-close {
+            position: absolute;
+
+            top: 24px;
+            right: 30px;
+
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 50%;
+
+            background: rgba(255,255,255,.08);
+
+            color: #fff;
+
+            font-size: 30px;
+            line-height: 1;
+
+            cursor: pointer;
+
+            transition: .2s ease;
+        }
+
+        .gallery-lightbox-close:hover {
+            background: #ffc400;
+            color: #08121b;
+            border-color: #ffc400;
+        }
+
+
+        /* =========================================================
+           PREVIOUS / NEXT
+        ========================================================= */
+
+        .gallery-lightbox-nav {
+            position: absolute;
+
+            top: 50%;
+
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+
+            transform: translateY(-50%);
+
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 50%;
+
+            background: rgba(255,255,255,.08);
+
+            color: #fff;
+
+            font-size: 29px;
+
+            cursor: pointer;
+
+            transition: .2s ease;
+        }
+
+        .gallery-lightbox-nav:hover {
+            background: #ffc400;
+            color: #08121b;
+            border-color: #ffc400;
+        }
+
+        .gallery-lightbox-prev {
+            left: 28px;
+        }
+
+        .gallery-lightbox-next {
+            right: 28px;
+        }
+
+
+        /* =========================================================
+           COUNTER
+        ========================================================= */
+
+        .gallery-lightbox-counter {
+            position: absolute;
+
+            bottom: 25px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            padding: 8px 15px;
+
+            background: rgba(255,255,255,.10);
+
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 30px;
+
+            color: #fff;
+
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media(max-width: 768px) {
+
+            .gallery-lightbox {
+                padding: 75px 15px;
+            }
+
+            .gallery-lightbox-image {
+                max-height: 75vh;
+            }
+
+            .gallery-lightbox-close {
+                top: 18px;
+                right: 18px;
+
+                width: 42px;
+                height: 42px;
+
+                font-size: 25px;
+            }
+
+            .gallery-lightbox-nav {
+                width: 44px;
+                height: 44px;
+
+                font-size: 23px;
+
+                background: rgba(0,0,0,.6);
+            }
+
+            .gallery-lightbox-prev {
+                left: 12px;
+            }
+
+            .gallery-lightbox-next {
+                right: 12px;
+            }
+
+            .gallery-lightbox-counter {
+                bottom: 18px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body data-page="gallery">
+
+    <div id="siteHeader"></div>
+
+
+    <main>
+
+        <!-- =====================================================
+             HERO
+        ====================================================== -->
+
+        <section class="page-hero">
+
+            <div class="shell">
+
+                <p class="bread">
+                    HOME / GALLERY
+                </p>
+
+                <p class="kicker">
+                    Gallery
+                </p>
+
+                <h1>
+                    Product and installation visuals.
+                </h1>
+
+                <p>
+                    Explore SAFE ESCAPE product, installation,
+                    safety testing and project visuals.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GALLERY
+        ====================================================== -->
+
+        <section class="section">
+
+            <div class="shell">
+
+                <div class="gallery-grid">
+
+
+                    <!-- IMAGE 01 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/product-img/hero-img.jpg"
+                            alt="SAFE ESCAPE emergency evacuation device"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                    <!-- IMAGE 02 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/3.jpeg"
+                            alt="SAFE ESCAPE descent system"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                    <!-- IMAGE 03 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/2.jpeg"
+                            alt="SAFE ESCAPE installation"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                    <!-- IMAGE 04 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/img7.jpeg"
+                            alt="SAFE ESCAPE balcony installation"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                    <!-- IMAGE 05 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/img3.jpeg"
+                            alt="SAFE ESCAPE safety testing"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                    <!-- IMAGE 06 -->
+
+                    <div class="gallery-item">
+
+                        <img
+                            src="assets/images/12.jpg"
+                            alt="SAFE ESCAPE load testing"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <p style="margin-top:30px">
+
+                    <a
+                        class="btn btn-dark"
+                        href="resources.html"
+                    >
+                        VIEW VIDEOS & RESOURCES →
+                    </a>
+
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <div id="siteFooter"></div>
+
+
+    <!-- =========================================================
+         LIGHTBOX / SLIDESHOW
+    ========================================================== -->
+
+    <div
+        class="gallery-lightbox"
+        id="galleryLightbox"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Gallery slideshow"
+    >
+
+        <!-- CLOSE -->
+
+        <button
+            class="gallery-lightbox-close"
+            id="galleryClose"
+            type="button"
+            aria-label="Close gallery"
+        >
+            ×
+        </button>
+
+
+        <!-- PREVIOUS -->
+
+        <button
+            class="gallery-lightbox-nav gallery-lightbox-prev"
+            id="galleryPrev"
+            type="button"
+            aria-label="Previous image"
+        >
+            ‹
+        </button>
+
+
+        <!-- IMAGE -->
+
+        <img
+            class="gallery-lightbox-image"
+            id="galleryLargeImage"
+            src=""
+            alt=""
+            draggable="false"
+        >
+
+
+        <!-- NEXT -->
+
+        <button
+            class="gallery-lightbox-nav gallery-lightbox-next"
+            id="galleryNext"
+            type="button"
+            aria-label="Next image"
+        >
+            ›
+        </button>
+
+
+        <!-- COUNTER -->
+
+        <div
+            class="gallery-lightbox-counter"
+            id="galleryCounter"
+        >
+            1 / 6
+        </div>
+
+    </div>
+
+
+    <!-- COMMON COMPONENTS -->
+
+    <script src="assets/js/components.js"></script>
+
+
+    <!-- =========================================================
+         GALLERY SLIDESHOW JS
+    ========================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                /* =============================================
+                   ELEMENTS
+                ============================================= */
+
+                const galleryImages =
+                    Array.from(
+                        document.querySelectorAll(
+                            ".gallery-item img"
+                        )
+                    );
+
+
+                const lightbox =
+                    document.querySelector(
+                        "#galleryLightbox"
+                    );
+
+
+                const largeImage =
+                    document.querySelector(
+                        "#galleryLargeImage"
+                    );
+
+
+                const closeButton =
+                    document.querySelector(
+                        "#galleryClose"
+                    );
+
+
+                const previousButton =
+                    document.querySelector(
+                        "#galleryPrev"
+                    );
+
+
+                const nextButton =
+                    document.querySelector(
+                        "#galleryNext"
+                    );
+
+
+                const counter =
+                    document.querySelector(
+                        "#galleryCounter"
+                    );
+
+
+                let currentIndex = 0;
+
+
+                /* =============================================
+                   UPDATE IMAGE
+                ============================================= */
+
+                function showImage(index) {
+
+                    if (!galleryImages.length) {
+                        return;
+                    }
+
+
+                    /*
+                     * Infinite slideshow
+                     */
+
+                    if (index < 0) {
+
+                        index =
+                            galleryImages.length - 1;
+
+                    }
+
+
+                    if (
+                        index >=
+                        galleryImages.length
+                    ) {
+
+                        index = 0;
+
+                    }
+
+
+                    currentIndex =
+                        index;
+
+
+                    const selectedImage =
+                        galleryImages[currentIndex];
+
+
+                    largeImage.src =
+                        selectedImage.src;
+
+
+                    largeImage.alt =
+                        selectedImage.alt || "SAFE ESCAPE Gallery";
+
+
+                    counter.textContent =
+                        `${currentIndex + 1} / ${galleryImages.length}`;
+
+                }
+
+
+                /* =============================================
+                   OPEN LIGHTBOX
+                ============================================= */
+
+                function openGallery(index) {
+
+                    showImage(index);
+
+
+                    lightbox.classList.add(
+                        "open"
+                    );
+
+
+                    /*
+                     * Stop background page scrolling
+                     */
+
+                    document.body.style.overflow =
+                        "hidden";
+
+
+                    closeButton.focus();
+
+                }
+
+
+                /* =============================================
+                   CLOSE LIGHTBOX
+                ============================================= */
+
+                function closeGallery() {
+
+                    lightbox.classList.remove(
+                        "open"
+                    );
+
+
+                    document.body.style.overflow =
+                        "";
+
+
+                    /*
+                     * Clear image after animation
+                     */
+
+                    setTimeout(
+                        function () {
+
+                            if (
+                                !lightbox.classList.contains(
+                                    "open"
+                                )
+                            ) {
+
+                                largeImage.src =
+                                    "";
+
+                            }
+
+                        },
+                        250
+                    );
+
+                }
+
+
+                /* =============================================
+                   NEXT
+                ============================================= */
+
+                function nextImage() {
+
+                    showImage(
+                        currentIndex + 1
+                    );
+
+                }
+
+
+                /* =============================================
+                   PREVIOUS
+                ============================================= */
+
+                function previousImage() {
+
+                    showImage(
+                        currentIndex - 1
+                    );
+
+                }
+
+
+                /* =============================================
+                   CLICK GALLERY IMAGE
+                ============================================= */
+
+                galleryImages.forEach(
+                    function (image, index) {
+
+                        image.addEventListener(
+                            "click",
+                            function () {
+
+                                openGallery(
+                                    index
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                /* =============================================
+                   BUTTON EVENTS
+                ============================================= */
+
+                closeButton.addEventListener(
+                    "click",
+                    closeGallery
+                );
+
+
+                previousButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.stopPropagation();
+
+                        previousImage();
+
+                    }
+                );
+
+
+                nextButton.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.stopPropagation();
+
+                        nextImage();
+
+                    }
+                );
+
+
+                /* =============================================
+                   CLICK OUTSIDE IMAGE = CLOSE
+                ============================================= */
+
+                lightbox.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (
+                            event.target ===
+                            lightbox
+                        ) {
+
+                            closeGallery();
+
+                        }
+
+                    }
+                );
+
+
+                /* =============================================
+                   KEYBOARD CONTROLS
+                ============================================= */
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            !lightbox.classList.contains(
+                                "open"
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * ESC
+                         */
+
+                        if (
+                            event.key ===
+                            "Escape"
+                        ) {
+
+                            closeGallery();
+
+                        }
+
+
+                        /*
+                         * RIGHT ARROW
+                         */
+
+                        if (
+                            event.key ===
+                            "ArrowRight"
+                        ) {
+
+                            nextImage();
+
+                        }
+
+
+                        /*
+                         * LEFT ARROW
+                         */
+
+                        if (
+                            event.key ===
+                            "ArrowLeft"
+                        ) {
+
+                            previousImage();
+
+                        }
+
+                    }
+                );
+
+
+                /* =============================================
+                   MOBILE SWIPE
+                ============================================= */
+
+                let touchStartX = 0;
+
+
+                lightbox.addEventListener(
+                    "touchstart",
+                    function (event) {
+
+                        touchStartX =
+                            event.changedTouches[0]
+                                .screenX;
+
+                    },
+                    {
+                        passive: true
+                    }
+                );
+
+
+                lightbox.addEventListener(
+                    "touchend",
+                    function (event) {
+
+                        const touchEndX =
+                            event.changedTouches[0]
+                                .screenX;
+
+
+                        const difference =
+                            touchStartX -
+                            touchEndX;
+
+
+                        /*
+                         * Ignore tiny movements
+                         */
+
+                        if (
+                            Math.abs(difference) <
+                            50
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                         * Swipe Left
+                         */
+
+                        if (
+                            difference > 0
+                        ) {
+
+                            nextImage();
+
+                        }
+
+
+                        /*
+                         * Swipe Right
+                         */
+
+                        else {
+
+                            previousImage();
+
+                        }
+
+                    },
+                    {
+                        passive: true
+                    }
+                );
+
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FAQ | SAFE ESCAPE</title>
+    <!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
+<link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/images/favicon.png">
+    <meta name="description"
+        content="Frequently asked questions about SAFE ESCAPE installation, operation, testing, power requirements and maintenance.">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div id="siteHeader"></div>
+    <main>
+        <section class="page-hero">
+            <div class="shell">
+                <p class="bread">HOME / FAQ</p>
+                <p class="kicker">Common Questions</p>
+                <h1>Clear answers for a serious decision.</h1>
+            </div>
+        </section>
+        <section class="section">
+            <div class="shell faq-layout">
+                <div>
+                    <p class="kicker">Need guidance?</p>
+                    <h2 style="font-size:45px;line-height:1.05">Call or WhatsApp +91 93116 05588.</h2>
+                </div>
+                <div id="faqFull"></div>
+            </div>
+        </section>
+    </main>
+    <div id="siteFooter"></div>
+    <script src="assets/js/components.js"></script>
+    <script>
+        const qas = [['What is SAFE ESCAPE?', 'An automatic, controlled-descent rescue device designed for emergency evacuation from high-rise buildings. You can use this to escape a fire accident emergency situation when no other escape route is available.'], ['Who can use it?', 'Any normal-health individual weighing from 30 kg to 100 kg who can wear the safety harness properly can descend, subject to official instructions and user limitations.'], ['Where can it be installed?', 'On a load-bearing reinforced concrete wall, beam or balcony pillar near an emergency exit window, under a permanent shade / ceiling, subject to professional structural assessment.'], ['How does the controlled descent work?', 'A purely mechanical internal braking system automatically controls descent without external power.'], ['What happens during a power failure?', 'The device operates mechanically and requires no electricity or batteries for its core descent function.'], ['What lengths are available?', 'Customized wire-rope lengths are available up to 100 metres based on target installation height.'], ['How many units does a building require?', 'This depends on floor layout, occupancy and the number of critical escape points. The supplied brief suggests approximately one device per 20 occupants as an indicative planning basis, subject to project assessment.'], ['Is installation required?', 'Yes. Professional anchor-bolting into an approved structural substrate is required.'], ['What testing/certification has been done?', 'The supplied material states that components undergo metallurgical analysis and assembly static-load testing up to 1,448 kg at NABL-accredited labs. Exact certificate/report details must be published on the Safety & Testing page once supplied.'], ['How can I buy this?', 'Directly through SAFE ESCAPE, authorized dealers, supported marketplaces or this website checkout.'], ['How long does installation take?', 'The supplied brief states that many installations may be completed in about half an hour, depending on structure and number of units.'], ['How many people can use it?', 'The system is intended for sequential use, subject to the specific model, condition and installation configuration.'], ['How often is maintenance required?', 'Periodic inspection and preventive maintenance is recommended at least annually, or as advised during installation.']]; document.querySelector('#faqFull').innerHTML = qas.map((x, i) => `<article class="faq-item"><button class="faq-q"><span>${String(i + 1).padStart(2, '0')}</span><b>${x[0]}</b><span>+</span></button><div class="faq-a">${x[1]}</div></article>`).join(''); document.querySelectorAll('.faq-q').forEach(b => b.addEventListener('click', () => b.closest('.faq-item').classList.toggle('open')));
+    </script>
+</body>
+
+</html>
