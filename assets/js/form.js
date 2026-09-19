@@ -264,9 +264,7 @@ function bindGoogleForm(form) {
 
       form.reset();
 
-      window.showToast?.(
-        'Thank you. Your details have been received successfully.'
-      );
+      showSuccessModal();
 
       form.querySelector('[data-form-success]')?.classList.add('show');
 
@@ -287,3 +285,45 @@ function bindGoogleForm(form) {
 document
   .querySelectorAll('[data-sheet-form]')
   .forEach(bindGoogleForm);
+
+  /* =====================================================
+   SUCCESS MODAL
+===================================================== */
+
+function showSuccessModal(){
+
+  const modal = document.getElementById('successModal');
+
+  if(!modal){
+    return;
+  }
+
+
+  modal.classList.add('show');
+
+
+  // Auto close after 3 seconds
+
+  setTimeout(()=>{
+
+    modal.classList.remove('show');
+
+  },3000);
+
+}
+
+
+
+/* CLOSE BUTTON */
+
+document.addEventListener('click', function(event){
+
+  if(event.target.id === 'successClose'){
+
+    document
+    .getElementById('successModal')
+    ?.classList.remove('show');
+
+  }
+
+});

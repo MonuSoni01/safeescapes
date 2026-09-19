@@ -26,7 +26,7 @@ const navItems = [
     name: 'Product',
     dropdown: [
       ['How It Works', 'index.html#how', 'how-it-works'],
-      ['Products', 'products.html', 'products'],
+     ['Buy Safe Escape', 'products.html', 'products'],
       ['Gallery', 'gallery.html', 'gallery']
     ]
   },
@@ -531,15 +531,45 @@ document.body.insertAdjacentHTML(
 </a>
 
 
- 
+<!-- SUCCESS MODAL -->
+
+<div class="success-modal" id="successModal">
+
+    <div class="success-modal-box">
+
+        <button class="success-close" id="successClose">
+            ×
+        </button>
 
 
-    <div
-      class="toast"
-      id="toast"
-      role="status"
-      aria-live="polite"
-    ></div>
+        <div class="success-icon">
+            ✓
+        </div>
+
+
+        <h2>
+            Thank You!
+        </h2>
+
+
+        <p>
+            Your enquiry has been submitted successfully.
+            Our team will contact you shortly.
+        </p>
+
+
+    </div>
+
+</div>
+
+
+
+<div
+  class="toast"
+  id="toast"
+  role="status"
+  aria-live="polite"
+></div>
 
   `
 );
@@ -683,396 +713,396 @@ window.showToast =
    Add this at the END of components.js
 ========================================================= */
 
-// (function () {
+(function () {
 
-//   "use strict";
+  "use strict";
 
 
-//   /* =========================================================
-//      1. DISABLE RIGHT CLICK
-//   ========================================================= */
+  /* =========================================================
+     1. DISABLE RIGHT CLICK
+  ========================================================= */
 
-//   document.addEventListener("contextmenu", function (event) {
+  document.addEventListener("contextmenu", function (event) {
 
-//     /*
-//       IMPORTANT:
-//       Form fields par right click allow rakha hai
-//       taaki users form normally use kar saken.
-//     */
+    /*
+      IMPORTANT:
+      Form fields par right click allow rakha hai
+      taaki users form normally use kar saken.
+    */
 
-//     const target = event.target;
+    const target = event.target;
 
-//     if (
-//       target.closest("input") ||
-//       target.closest("textarea") ||
-//       target.closest("select")
-//     ) {
-//       return;
-//     }
+    if (
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("select")
+    ) {
+      return;
+    }
 
-//     event.preventDefault();
+    event.preventDefault();
 
-//     if (typeof window.showToast === "function") {
-//       window.showToast(
-//         "Content on this website is protected."
-//       );
-//     }
+    if (typeof window.showToast === "function") {
+      window.showToast(
+        "Content on this website is protected."
+      );
+    }
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      2. PREVENT IMAGE DRAGGING
-//   ========================================================= */
+  /* =========================================================
+     2. PREVENT IMAGE DRAGGING
+  ========================================================= */
 
-//   document.addEventListener("dragstart", function (event) {
+  document.addEventListener("dragstart", function (event) {
 
-//     if (
-//       event.target &&
-//       event.target.tagName === "IMG"
-//     ) {
+    if (
+      event.target &&
+      event.target.tagName === "IMG"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//     }
+    }
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      3. DISABLE IMAGE CONTEXT MENU
-//   ========================================================= */
+  /* =========================================================
+     3. DISABLE IMAGE CONTEXT MENU
+  ========================================================= */
 
-//   document.addEventListener("contextmenu", function (event) {
+  document.addEventListener("contextmenu", function (event) {
 
-//     if (
-//       event.target &&
-//       event.target.tagName === "IMG"
-//     ) {
+    if (
+      event.target &&
+      event.target.tagName === "IMG"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//     }
+    }
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      4. PREVENT NORMAL TEXT COPY
+  /* =========================================================
+     4. PREVENT NORMAL TEXT COPY
 
-//      Forms are excluded so users can still copy/paste
-//      their name, email, address, serial number etc.
-//   ========================================================= */
+     Forms are excluded so users can still copy/paste
+     their name, email, address, serial number etc.
+  ========================================================= */
 
-//   document.addEventListener("copy", function (event) {
+  document.addEventListener("copy", function (event) {
 
-//     const target = event.target;
+    const target = event.target;
 
-//     if (
-//       target.closest("input") ||
-//       target.closest("textarea")
-//     ) {
-//       return;
-//     }
+    if (
+      target.closest("input") ||
+      target.closest("textarea")
+    ) {
+      return;
+    }
 
-//     event.preventDefault();
+    event.preventDefault();
 
-//     if (typeof window.showToast === "function") {
+    if (typeof window.showToast === "function") {
 
-//       window.showToast(
-//         "Copying website content is not permitted."
-//       );
+      window.showToast(
+        "Copying website content is not permitted."
+      );
 
-//     }
+    }
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      5. PREVENT CUT
+  /* =========================================================
+     5. PREVENT CUT
 
-//      Again: allow inside forms.
-//   ========================================================= */
+     Again: allow inside forms.
+  ========================================================= */
 
-//   document.addEventListener("cut", function (event) {
+  document.addEventListener("cut", function (event) {
 
-//     const target = event.target;
+    const target = event.target;
 
-//     if (
-//       target.closest("input") ||
-//       target.closest("textarea")
-//     ) {
-//       return;
-//     }
+    if (
+      target.closest("input") ||
+      target.closest("textarea")
+    ) {
+      return;
+    }
 
-//     event.preventDefault();
+    event.preventDefault();
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      6. BLOCK COMMON COPY / SAVE SHORTCUTS
-//   ========================================================= */
+  /* =========================================================
+     6. BLOCK COMMON COPY / SAVE SHORTCUTS
+  ========================================================= */
 
-//   document.addEventListener("keydown", function (event) {
+  document.addEventListener("keydown", function (event) {
 
-//     const key =
-//       event.key.toLowerCase();
+    const key =
+      event.key.toLowerCase();
 
 
-//     const target =
-//       event.target;
+    const target =
+      event.target;
 
 
-//     const isFormField =
-//       target instanceof HTMLElement &&
-//       (
-//         target.matches("input") ||
-//         target.matches("textarea") ||
-//         target.matches("select") ||
-//         target.isContentEditable
-//       );
+    const isFormField =
+      target instanceof HTMLElement &&
+      (
+        target.matches("input") ||
+        target.matches("textarea") ||
+        target.matches("select") ||
+        target.isContentEditable
+      );
 
 
-//     /*
-//       Forms must work normally.
+    /*
+      Forms must work normally.
 
-//       Ctrl+C
-//       Ctrl+V
-//       Ctrl+X
-//       Ctrl+A
+      Ctrl+C
+      Ctrl+V
+      Ctrl+X
+      Ctrl+A
 
-//       remain available inside form fields.
-//     */
+      remain available inside form fields.
+    */
 
-//     if (isFormField) {
-//       return;
-//     }
+    if (isFormField) {
+      return;
+    }
 
 
-//     /* -----------------------------------------
-//        CTRL / CMD + C
-//        Copy
-//     ----------------------------------------- */
+    /* -----------------------------------------
+       CTRL / CMD + C
+       Copy
+    ----------------------------------------- */
 
-//     if (
-//       (event.ctrlKey || event.metaKey) &&
-//       key === "c"
-//     ) {
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      key === "c"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//       window.showToast?.(
-//         "Copying website content is not permitted."
-//       );
+      window.showToast?.(
+        "Copying website content is not permitted."
+      );
 
-//       return;
+      return;
 
-//     }
+    }
 
 
-//     /* -----------------------------------------
-//        CTRL / CMD + X
-//     ----------------------------------------- */
+    /* -----------------------------------------
+       CTRL / CMD + X
+    ----------------------------------------- */
 
-//     if (
-//       (event.ctrlKey || event.metaKey) &&
-//       key === "x"
-//     ) {
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      key === "x"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//       return;
+      return;
 
-//     }
+    }
 
 
-//     /* -----------------------------------------
-//        CTRL / CMD + S
-//        Save Page
-//     ----------------------------------------- */
+    /* -----------------------------------------
+       CTRL / CMD + S
+       Save Page
+    ----------------------------------------- */
 
-//     if (
-//       (event.ctrlKey || event.metaKey) &&
-//       key === "s"
-//     ) {
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      key === "s"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//       window.showToast?.(
-//         "Saving this page is disabled."
-//       );
+      window.showToast?.(
+        "Saving this page is disabled."
+      );
 
-//       return;
+      return;
 
-//     }
+    }
 
 
-//     /* -----------------------------------------
-//        CTRL / CMD + U
-//        View Source shortcut
-//     ----------------------------------------- */
+    /* -----------------------------------------
+       CTRL / CMD + U
+       View Source shortcut
+    ----------------------------------------- */
 
-//     if (
-//       (event.ctrlKey || event.metaKey) &&
-//       key === "u"
-//     ) {
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      key === "u"
+    ) {
 
-//       event.preventDefault();
+      event.preventDefault();
 
-//       return;
+      return;
 
-//     }
+    }
 
-//   });
+  });
 
 
-//   /* =========================================================
-//      7. MAKE ALL IMAGES NON-DRAGGABLE
-//   ========================================================= */
+  /* =========================================================
+     7. MAKE ALL IMAGES NON-DRAGGABLE
+  ========================================================= */
 
-//   function protectImages() {
+  function protectImages() {
 
-//     document
-//       .querySelectorAll("img")
-//       .forEach(function (img) {
+    document
+      .querySelectorAll("img")
+      .forEach(function (img) {
 
-//         img.setAttribute(
-//           "draggable",
-//           "false"
-//         );
+        img.setAttribute(
+          "draggable",
+          "false"
+        );
 
-//         img.style.webkitUserDrag =
-//           "none";
+        img.style.webkitUserDrag =
+          "none";
 
-//       });
+      });
 
-//   }
+  }
 
 
-//   protectImages();
+  protectImages();
 
 
-//   /* =========================================================
-//      8. PROTECT IMAGES ADDED LATER
+  /* =========================================================
+     8. PROTECT IMAGES ADDED LATER
 
-//      Important because your site dynamically injects
-//      header/footer/components.
-//   ========================================================= */
+     Important because your site dynamically injects
+     header/footer/components.
+  ========================================================= */
 
-//   const imageObserver =
-//     new MutationObserver(function (mutations) {
+  const imageObserver =
+    new MutationObserver(function (mutations) {
 
-//       mutations.forEach(function (mutation) {
+      mutations.forEach(function (mutation) {
 
-//         mutation.addedNodes.forEach(function (node) {
+        mutation.addedNodes.forEach(function (node) {
 
-//           if (!(node instanceof HTMLElement)) {
-//             return;
-//           }
+          if (!(node instanceof HTMLElement)) {
+            return;
+          }
 
 
-//           if (node.tagName === "IMG") {
+          if (node.tagName === "IMG") {
 
-//             node.setAttribute(
-//               "draggable",
-//               "false"
-//             );
+            node.setAttribute(
+              "draggable",
+              "false"
+            );
 
-//             node.style.webkitUserDrag =
-//               "none";
+            node.style.webkitUserDrag =
+              "none";
 
-//           }
+          }
 
 
-//           node
-//             .querySelectorAll?.("img")
-//             .forEach(function (img) {
+          node
+            .querySelectorAll?.("img")
+            .forEach(function (img) {
 
-//               img.setAttribute(
-//                 "draggable",
-//                 "false"
-//               );
+              img.setAttribute(
+                "draggable",
+                "false"
+              );
 
-//               img.style.webkitUserDrag =
-//                 "none";
+              img.style.webkitUserDrag =
+                "none";
 
-//             });
+            });
 
-//         });
+        });
 
-//       });
+      });
 
-//     });
+    });
 
 
-//   imageObserver.observe(
-//     document.body,
-//     {
-//       childList: true,
-//       subtree: true
-//     }
-//   );
+  imageObserver.observe(
+    document.body,
+    {
+      childList: true,
+      subtree: true
+    }
+  );
 
 
-//   /* =========================================================
-//      9. DISABLE TEXT SELECTION
-//      EXCEPT FORM ELEMENTS
-//   ========================================================= */
+  /* =========================================================
+     9. DISABLE TEXT SELECTION
+     EXCEPT FORM ELEMENTS
+  ========================================================= */
 
-//   const protectionStyle =
-//     document.createElement("style");
+  const protectionStyle =
+    document.createElement("style");
 
 
-//   protectionStyle.textContent = `
+  protectionStyle.textContent = `
 
-//     body {
-//       -webkit-user-select: none;
-//       -moz-user-select: none;
-//       user-select: none;
-//     }
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
 
 
-//     img {
-//       -webkit-user-drag: none;
-//       user-drag: none;
-//       -webkit-user-select: none;
-//       user-select: none;
-//     }
+    img {
+      -webkit-user-drag: none;
+      user-drag: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
 
 
-//     /*
-//        IMPORTANT:
-//        Forms must remain fully usable.
-//     */
+    /*
+       IMPORTANT:
+       Forms must remain fully usable.
+    */
 
-//     input,
-//     textarea,
-//     select,
-//     option,
-//     [contenteditable="true"] {
+    input,
+    textarea,
+    select,
+    option,
+    [contenteditable="true"] {
 
-//       -webkit-user-select: text !important;
-//       -moz-user-select: text !important;
-//       user-select: text !important;
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      user-select: text !important;
 
-//     }
+    }
 
-//   `;
+  `;
 
 
-//   document.head.appendChild(
-//     protectionStyle
-//   );
+  document.head.appendChild(
+    protectionStyle
+  );
 
 
-//   /* =========================================================
-//      INITIALIZED
-//   ========================================================= */
+  /* =========================================================
+     INITIALIZED
+  ========================================================= */
 
-//   console.log(
-//     "SAFE ESCAPE content protection enabled."
-//   );
+  console.log(
+    "SAFE ESCAPE content protection enabled."
+  );
 
 
-// })();
+})();

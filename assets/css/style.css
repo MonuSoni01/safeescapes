@@ -4413,7 +4413,7 @@ color:#9dacb6;
 
     padding:45px;
 
-    background:#08121b;
+    background:#cf2d27;
 
     color:#fff;
 
@@ -4947,5 +4947,119 @@ iframe {
     .warranty-years strong {
         font-size: 27px;
     }
+
+}
+
+/* ===============================
+ SUCCESS FORM MODAL
+================================ */
+
+
+.success-modal{
+
+position:fixed;
+inset:0;
+
+background:rgba(0,0,0,.65);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+z-index:99999;
+
+opacity:0;
+visibility:hidden;
+
+transition:.3s;
+
+}
+
+
+.success-modal.show{
+
+opacity:1;
+visibility:visible;
+
+}
+
+
+
+.success-modal-box{
+
+width:90%;
+max-width:420px;
+
+background:white;
+
+padding:40px 30px;
+
+border-radius:20px;
+
+text-align:center;
+
+position:relative;
+
+}
+
+
+
+.success-icon{
+
+width:70px;
+height:70px;
+
+background:#018281;
+
+color:#fff;
+
+font-size:40px;
+
+border-radius:50%;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+margin:auto;
+
+}
+
+
+
+.success-modal-box h2{
+
+font-size:28px;
+
+margin:20px 0 10px;
+
+}
+
+
+
+.success-modal-box p{
+
+color:#555;
+
+line-height:1.6;
+
+}
+
+
+
+.success-close{
+
+position:absolute;
+
+right:15px;
+top:10px;
+
+border:none;
+
+background:none;
+
+font-size:32px;
+
+cursor:pointer;
 
 }
