@@ -33,7 +33,7 @@ export const functionsBaseUrl = "/.netlify/functions";
 // Safe to use on frontend.
 // NEVER put Razorpay Key Secret in this file.
 
-export const razorpayKeyId = "rzp_test_Td0D48OuB6hjeT";
+export const razorpayKeyId = "rzp_live_TgncjGJ1VQhzU4";
 
 
 // ------------------------------------------------------
