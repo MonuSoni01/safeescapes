@@ -50,7 +50,7 @@ async function validateCoupon(db, code, amount) {
 async function serverPrice(db, cart={}) {
   const idx=Math.min(Math.max(Math.floor(Number(cart.floorIndex)||0),0),floorLengths.length-1);
   const qty=Math.max(1,Math.floor(Number(cart.quantity)||1));
-  const unit=49999+idx*1250;
+  const unit=10;
   const items=[]; let extras=0;
   for(const row of Array.isArray(cart.accessories)?cart.accessories:[]) {
     const item=accessoryCatalog[row?.id]; if(!item) continue;
