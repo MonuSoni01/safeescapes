@@ -100,8 +100,8 @@ function render() {
 
                 <b>
                     ${formatINR(
-                        a.price * a.quantity
-                    )}
+        a.price * a.quantity
+    )}
                 </b>
 
             </div>
@@ -116,11 +116,10 @@ function render() {
             </span>
 
             <b>
-                ${
-                    s.bulk
-                    ? '−' + formatINR(s.bulk)
-                    : '₹0'
-                }
+                ${s.bulk
+            ? '−' + formatINR(s.bulk)
+            : '₹0'
+        }
             </b>
 
         </div>
@@ -130,21 +129,19 @@ function render() {
 
             <span>
                 Coupon
-                ${
-                    cart.couponCode
-                    ? `(${cart.couponCode})`
-                    : ''
-                }
+                ${cart.couponCode
+            ? `(${cart.couponCode})`
+            : ''
+        }
             </span>
 
             <b>
-                ${
-                    s.couponDiscount
-                    ? '−' + formatINR(
-                        s.couponDiscount
-                    )
-                    : '₹0'
-                }
+                ${s.couponDiscount
+            ? '−' + formatINR(
+                s.couponDiscount
+            )
+            : '₹0'
+        }
             </b>
 
         </div>
@@ -658,10 +655,10 @@ form?.addEventListener(
 
 
             const response =
-    await fetch(
-        endpoint(
-            '/create-razorpay-order'
-        ), 
+                await fetch(
+                    endpoint(
+                        '/create-razorpay-order'
+                    ),
                     {
 
                         method: 'POST',
@@ -814,14 +811,18 @@ form?.addEventListener(
                             localStorage.removeItem(
                                 'safeEscapeCart'
                             );
+const finalOrderId =
+    verified.orderId ||
+    order.orderRef ||
+    response.razorpay_payment_id;
 
+const finalOrderNumber =
+    verified.orderNumber ||
+    verified.orderNo ||
+    finalOrderId;
 
-                            location.href =
-                                `order-success.html?order=${
-                                    encodeURIComponent(
-                                        verified.orderId
-                                    )
-                                }`;
+window.location.href =
+    `./order-success.html?order=${encodeURIComponent(finalOrderId)}&orderNo=${encodeURIComponent(finalOrderNumber)}`;
 
 
                         }
