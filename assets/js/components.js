@@ -335,7 +335,9 @@ Register Warranty
 <a href="resources.html">
 Resources
 </a>
-
+<a href="work-with-us.html">
+Work with Us
+</a>
 
 </div>
 

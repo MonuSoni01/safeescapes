@@ -953,7 +953,7 @@ button {
     background: #eef2f4;
     display: grid;
     place-items: center;
-    font-size: 28px
+    font-size: 12px
 }
 
 .accessory-card strong {

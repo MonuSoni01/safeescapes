@@ -34,34 +34,39 @@ document.addEventListener('DOMContentLoaded', () => {
      ACCESSORY CATALOG
   ===================================================== */
 
-  const catalog = {
 
-    'Adult Safety Belt-Orange': {
-      id: 'adult-belt',
-      price: 1499
-    },
+const catalog = {
+  'Adult Safety Belt-Orange': {
+    id: 'adult-belt',
+    price: 1499
+  },
 
-    'Child Safety Belt': {
-      id: 'child-belt',
-      price: 1299
-    },
+  'Child Safety Belt': {
+    id: 'child-belt',
+    price: 1299
+  },
 
-    'Gloves per pair': {
-      id: 'gloves',
-      price: 199
-    },
+  'Gloves per pair': {
+    id: 'gloves',
+    price: 199
+  },
 
-    'Safety Helmet': {
-      id: 'helmet',
-      price: 1299
-    },
+  'Safety Helmet': {
+    id: 'helmet',
+    price: 1299
+  },
 
-    'SAFE ESCAPE Covering Box': {
-      id: 'cover-box',
-      price: 1999
-    }
+  'SAFE ESCAPE Covering Box': {
+    id: 'cover-box',
+    price: 1999
+  },
 
-  };
+  'Installation Frame': {
+    id: 'installation-frame',
+    price: 1199
+  }
+};
+
 
 
   /* =====================================================
