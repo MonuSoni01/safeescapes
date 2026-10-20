@@ -71,4 +71,4 @@ export const apiEndpoints = {
 // ------------------------------------------------------
 
 export const googleSheetWebAppUrl =
-    "https://script.google.com/macros/s/AKfycbySYJgoWYSoSM8Gw-fTWBV1bo2ryMSkkJQH_mZaWcJs66_PTXPUZrHDI60GtkwgzvZI/exec";
+    "https://script.google.com/macros/s/AKfycbywHTklBTH_M9GVz_QTC1dftOqOzHW0ri8gA5e0YwCrB4NJULBJVGeoVii16CsZRD_v/exec";
