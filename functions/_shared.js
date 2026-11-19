@@ -1,14 +1,27 @@
+const crypto = require('crypto');
 const admin = require('firebase-admin');
 
-function getDb() {
+function initAdmin() {
   if (!admin.apps.length) {
     const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
     if (!raw) throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON is missing in .env / Netlify environment variables.');
     const serviceAccount = JSON.parse(raw);
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   }
+  return admin;
+}
+
+function getDb() {
+  initAdmin();
   return admin.firestore();
 }
+
+/* Support contact shown to customers when something goes wrong */
+const SUPPORT = {
+  phone: process.env.SUPPORT_PHONE || '+91 93116 05588',
+  whatsapp: process.env.SUPPORT_WHATSAPP || '919311605588',
+  email: process.env.SUPPORT_EMAIL || 'safeescapesolutions@gmail.com'
+};
 
 const floorLengths = [15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
 const accessoryCatalog = {
@@ -31,6 +44,57 @@ function cleanCustomer(c={}) {
   for (const [k,v] of Object.entries(c)) out[k]=typeof v==='string'?v.trim():v;
   return out;
 }
+
+function secureEqual(a, b) {
+  const A = Buffer.from(String(a || ''));
+  const B = Buffer.from(String(b || ''));
+  return A.length === B.length && crypto.timingSafeEqual(A, B);
+}
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(String(token || '')).digest('hex');
+}
+
+/* Firestore Timestamp -> ISO string (safe for JSON responses) */
+function toIso(value) {
+  if (!value) return '';
+  if (typeof value.toDate === 'function') return value.toDate().toISOString();
+  const d = new Date(value);
+  return isNaN(d) ? '' : d.toISOString();
+}
+
+/* Public-safe order summary for the thank-you page */
+function orderSummary(order = {}) {
+  return {
+    orderId: order.orderId || '',
+    orderNumber: order.orderNumber || '',
+    invoiceNumber: order.invoiceNumber || '',
+    status: order.status || '',
+    customer: order.customer || {},
+    cart: order.cart || {},
+    pricing: order.pricing || {},
+    razorpayPaymentId: order.razorpayPaymentId || '',
+    paidAt: toIso(order.paidAt) || new Date().toISOString(),
+    createdAt: toIso(order.createdAt)
+  };
+}
+
+/* Checks "Authorization: Bearer <Firebase ID token>" belongs to an admin */
+async function verifyAdmin(event) {
+  const header = (event.headers && (event.headers.authorization || event.headers.Authorization)) || '';
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  if (!match) return null;
+  try {
+    initAdmin();
+    const decoded = await admin.auth().verifyIdToken(match[1]);
+    const adminDoc = await admin.firestore().collection('admins').doc(decoded.uid).get();
+    return adminDoc.exists ? decoded : null;
+  } catch (e) {
+    console.error('ADMIN VERIFY ERROR:', e.message);
+    return null;
+  }
+}
+
 async function validateCoupon(db, code, amount) {
   const normalized=String(code||'').trim().toUpperCase();
   if(!normalized) return {valid:false,code:'',discount:0};
@@ -61,4 +125,8 @@ async function serverPrice(db, cart={}) {
   const coupon=await validateCoupon(db,cart.couponCode,subtotal-bulk);
   return {floorIndex:idx,length:floorLengths[idx],quantity:qty,unit,items,product,extras,subtotal,bulk,couponCode:coupon.code,couponDiscount:coupon.discount,total:Math.max(0,subtotal-bulk-coupon.discount)};
 }
-module.exports={getDb,json,validCustomer,cleanCustomer,serverPrice,admin};
+
+module.exports={
+  getDb,json,validCustomer,cleanCustomer,serverPrice,validateCoupon,admin,
+  secureEqual,hashToken,toIso,orderSummary,verifyAdmin,SUPPORT
+};

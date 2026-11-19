@@ -12,3 +12,17 @@ Flow: Checkout -> Razorpay -> signature verification -> Firestore paid order -> 
 9. Before production deploy, add all private `.env` values in Netlify Environment Variables. Do not deploy `.env`.
 
 IMPORTANT: Shiprocket package dimensions/weight in `.env` are placeholders. Replace with actual packed-product values before real shipments.
+
+## Update — Fast Thank You page (Nov 2026)
+
+New flow (customer sees Thank You page in ~1–2 seconds):
+
+1. `verify-razorpay-payment` → only verifies signature + marks order PAID + order number + coupon usage (one Firestore transaction). Returns immediately.
+2. Thank You page (`order-success.html`) shows full order details instantly, then silently calls
+   `process-order` twice: `step: "shipping"` (Shiprocket) and `step: "documents"` (Apps Script → Sheet, PDF invoice, email).
+3. If anything fails, Admin → Orders → View → **Retry Shiprocket** / **Resend Invoice & Email**.
+4. If payment verification is slow/fails, customer lands on Thank You page in "confirming" mode, it retries automatically,
+   and shows Call / WhatsApp / Email support buttons with Order Ref + Payment ID.
+
+Optional env vars (defaults already set): `SUPPORT_PHONE`, `SUPPORT_WHATSAPP`, `SUPPORT_EMAIL`.
+No new required env vars. Deploy the new file `functions/process-order.js` and `functions/_automation.js`.

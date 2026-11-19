@@ -1,86 +1,122 @@
-
 <!doctype html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
   <title>SAFE ESCAPE Admin Dashboard</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/images/favicon.png">
-  <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
-  <link rel="apple-touch-icon" href="assets/images/favicon.png">
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+  <link rel="shortcut icon" href="../assets/images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/images/favicon.png">
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 
 <body class="admin-page">
 
-  <!-- LOGIN -->
+  <!-- ===================================================
+       LOGIN
+  ==================================================== -->
   <section class="login-screen" id="adminLogin">
-    <div class="login-card">
 
-      <div class="login-logo">
-        <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
-      </div>
+    <div class="login-topbar">
+      <a href="../index.html" class="go-website">
+        <span>←</span> Go to Website
+      </a>
+    </div>
 
-      <h1>Welcome back.</h1>
-      <p class="login-text">
-        Sign in to manage orders, customer requests, warranty registrations and offers.
-      </p>
+    <div class="login-wrap">
 
-      <p id="configWarning" hidden class="notice">
-        Add Firebase configuration in <b>assets/js/firebase-config.js</b>.
-      </p>
+      <aside class="login-hero">
+        <div class="login-hero-inner">
+          <img src="../assets/images/logo.png" alt="SAFE ESCAPE" class="login-hero-logo">
+          <h2>Your Rescue Partner™<br><span>Control Center</span></h2>
+          <p>Orders, payments, enquiries, warranty and offers — all in one secure place.</p>
+          <ul class="login-points">
+            <li><i>✓</i> Real-time Firebase records</li>
+            <li><i>✓</i> Razorpay-verified payments</li>
+            <li><i>✓</i> Server-verified coupons</li>
+          </ul>
+        </div>
+      </aside>
 
-      <form id="loginForm">
-        <div class="field">
-          <label>Email Address</label>
-          <input type="email" name="email" placeholder="admin@safeescape.com" required>
+      <div class="login-card">
+
+        <div class="login-logo">
+          <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
         </div>
 
-        <div class="field">
-          <label>Password</label>
-          <input type="password" name="password" placeholder="Enter password" required>
-        </div>
-
-        <div class="login-options">
-          <label class="remember-login">
-            <input type="checkbox">
-            <span>Keep me signed in</span>
-          </label>
-
-          <button type="button" id="forgotPasswordBtn" class="forgot-password">
-            Forgot password?
-          </button>
-        </div>
-
-        <button class="btn login-button" type="submit">
-          LOGIN TO DASHBOARD <span>→</span>
-        </button>
-      </form>
-
-      <div class="login-footer">
-        <div class="login-secure">
-          <span>✓</span> Secure administrative access
-        </div>
-
-        <p>
-          Design &amp; Developed by
-          <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">
-            Rank Chahiye
-          </a>
+        <h1>Welcome back.</h1>
+        <p class="login-text">
+          Sign in to manage orders, customer requests, warranty registrations and offers.
         </p>
-      </div>
 
+        <p id="configWarning" hidden class="notice">
+          Add Firebase configuration in <b>assets/js/firebase-config.js</b>.
+        </p>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="loginEmail">Email Address</label>
+            <input id="loginEmail" type="email" name="email" placeholder="admin@safeescape.com" autocomplete="username" required>
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <div class="password-wrap">
+              <input id="loginPassword" type="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+              <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password" title="Show password">
+                <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-options">
+            <label class="remember-login">
+              <input type="checkbox" id="rememberMe" checked>
+              <span>Keep me signed in</span>
+            </label>
+
+            <button type="button" id="forgotPasswordBtn" class="forgot-password">
+              Forgot password?
+            </button>
+          </div>
+
+          <p class="login-error" id="loginError" hidden></p>
+
+          <button class="btn login-button" type="submit" id="loginButton">
+            <span class="btn-label">LOGIN TO DASHBOARD</span> <span class="btn-arrow">→</span>
+          </button>
+        </form>
+
+        <div class="login-footer">
+          <div class="login-secure">
+            <span>✓</span> Secure administrative access
+          </div>
+          <p>
+            Design &amp; Developed by
+            <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">Rank Chahiye</a>
+          </p>
+        </div>
+
+      </div>
     </div>
   </section>
 
-  <!-- DASHBOARD -->
+  <!-- ===================================================
+       DASHBOARD
+  ==================================================== -->
   <div class="admin-layout" id="adminPanel" hidden>
 
-    <aside class="sidebar">
-      <a href="../index.html" class="brand">
+    <aside class="sidebar" id="sidebar">
+      <a href="../index.html" class="brand" target="_blank" rel="noopener">
         <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
       </a>
 
@@ -88,93 +124,113 @@
 
       <nav class="side-nav">
         <button class="active" data-admin-tab="orders">
-          <span class="nav-icon">◫</span>
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+          </span>
           <span>Orders</span>
+          <em class="nav-count" id="navOrders"></em>
         </button>
 
         <button data-admin-tab="enquiries">
-          <span class="nav-icon">◎</span>
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
           <span>Enquiries</span>
+          <em class="nav-count" id="navEnquiries"></em>
         </button>
 
         <button data-admin-tab="warranty">
-          <span class="nav-icon">✓</span>
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </span>
           <span>Warranty</span>
+          <em class="nav-count" id="navWarranty"></em>
         </button>
 
         <button data-admin-tab="coupons">
-          <span class="nav-icon">%</span>
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+          </span>
           <span>Coupons</span>
+          <em class="nav-count" id="navCoupons"></em>
         </button>
       </nav>
 
+      <a href="../index.html" target="_blank" rel="noopener" class="sidebar-website">
+        <span>↗</span> Go to Website
+      </a>
+
       <div class="sidebar-bottom">
         <div class="admin-initial">SE</div>
-
         <div class="admin-user">
           <b id="adminEmail">Admin</b>
           <small>Authorized User</small>
         </div>
-
-        <button id="logoutBtn" class="logout-button" title="Logout">↗</button>
+        <button id="logoutBtn" class="logout-button" title="Logout" aria-label="Logout">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
       </div>
     </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <main class="dashboard-main">
 
       <header class="dashboard-header">
-        <div>
-          <p class="mini-title" id="dashboardKicker">ORDER MANAGEMENT</p>
-          <h1 id="dashboardTitle">Orders Overview</h1>
-          <p id="dashboardDescription">
-            Track orders, payment status and fulfilment progress.
-          </p>
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+          <div>
+            <p class="mini-title" id="dashboardKicker">ORDER MANAGEMENT</p>
+            <h1 id="dashboardTitle">Orders Overview</h1>
+            <p id="dashboardDescription">Track orders, payment status and fulfilment progress.</p>
+          </div>
         </div>
 
         <div class="header-actions">
-          <a href="../index.html" target="_blank" class="view-site">
-            VIEW WEBSITE ↗
-          </a>
-
+          <button type="button" class="icon-action" id="refreshBtn" title="Refresh data">⟳ Refresh</button>
+          <a href="../index.html" target="_blank" rel="noopener" class="view-site">GO TO WEBSITE ↗</a>
           <span class="live-tag"><i></i> LIVE</span>
         </div>
       </header>
 
       <section class="stats-grid">
-        <article class="stat-card">
+        <article class="stat-card stat-orders">
+          <div class="stat-icon">◫</div>
           <span>Total Orders</span>
           <strong id="orderCount">—</strong>
-          <small>Latest order records</small>
+          <small id="orderSub">Latest order records</small>
         </article>
 
-        <article class="stat-card">
+        <article class="stat-card stat-revenue">
+          <div class="stat-icon">₹</div>
+          <span>Paid Revenue</span>
+          <strong id="revenueCount">—</strong>
+          <small id="revenueSub">From paid orders</small>
+        </article>
+
+        <article class="stat-card stat-enquiries">
+          <div class="stat-icon">◎</div>
           <span>Enquiries</span>
           <strong id="enquiryCount">—</strong>
-          <small>Contact, Dealer, Bulk & Referral</small>
+          <small>Contact, Dealer, Bulk &amp; Referral</small>
         </article>
 
-        <article class="stat-card">
-          <span>Warranty</span>
-          <strong id="warrantyCount">—</strong>
-          <small>Registration requests</small>
-        </article>
-
-        <article class="stat-card">
+        <article class="stat-card stat-coupons">
+          <div class="stat-icon">%</div>
           <span>Coupons</span>
           <strong id="couponCount">—</strong>
-          <small>Saved promotional offers</small>
+          <small id="couponSub">Saved promotional offers</small>
         </article>
       </section>
 
-      <!-- COUPON SECTION -->
+      <!-- COUPON FORM -->
       <section id="couponManager" class="coupon-section" hidden>
         <div class="section-heading">
           <div>
-            <p class="mini-title">DISCOUNT MANAGEMENT</p>
-            <h2>Create or Update Coupon</h2>
-            <p>Every coupon is securely verified before payment.</p>
+            <p class="mini-title" id="couponFormKicker">DISCOUNT MANAGEMENT</p>
+            <h2 id="couponFormTitle">Create New Coupon</h2>
+            <p>Every coupon is securely verified on the server before payment.</p>
           </div>
-
           <span class="secure-tag">● SERVER VERIFIED</span>
         </div>
 
@@ -208,7 +264,7 @@
           </div>
 
           <div class="field">
-            <label>Maximum Discount (₹)</label>
+            <label>Maximum Discount (₹) <em>0 = no cap</em></label>
             <input name="maxDiscount" type="number" min="0" value="0">
           </div>
 
@@ -235,61 +291,77 @@
             </span>
           </label>
 
-          <button class="btn coupon-save" type="submit">
-            SAVE COUPON <span>→</span>
-          </button>
+          <div class="coupon-buttons">
+            <button class="btn coupon-save" type="submit" id="couponSaveBtn">
+              <span id="couponSaveLabel">SAVE COUPON</span> <span>→</span>
+            </button>
+            <button class="btn btn-light" type="button" id="couponCancelEdit" hidden>CANCEL EDIT</button>
+          </div>
         </form>
       </section>
 
-      <!-- RECORD TABLE -->
+      <!-- RECORDS -->
       <section class="records-section">
         <div class="records-heading">
           <div>
             <h2 id="recordsTitle">Recent Orders</h2>
             <p id="recordsDescription">All records from your Firebase database.</p>
           </div>
-
           <span class="record-count" id="recordCount">LIVE DATA</span>
         </div>
 
-        <div id="dataOut">
-          <div class="admin-loading">
-            <span></span> Loading dashboard data…
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" id="tableSearch" placeholder="Search name, mobile, email, order no…">
           </div>
+          <select id="statusFilter" class="toolbar-select" hidden></select>
         </div>
+
+        <div id="dataOut">
+          <div class="admin-loading"><span></span> Loading dashboard data…</div>
+        </div>
+
+        <div class="pagination" id="pagination" hidden></div>
       </section>
 
       <footer class="dashboard-footer">
         Design &amp; Developed by
-        <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">
-          Rank Chahiye
-        </a>
+        <a href="https://www.rankchahiye.com/" target="_blank" rel="noopener">Rank Chahiye</a>
       </footer>
 
     </main>
   </div>
 
-  <!-- DETAIL POPUP -->
+  <!-- DETAIL / EDIT MODAL -->
   <div class="detail-modal" id="detailModal" hidden>
     <div class="detail-modal-box">
       <div class="detail-modal-head">
         <div>
-          <p class="mini-title">FORM DETAILS</p>
+          <p class="mini-title" id="detailKicker">FORM DETAILS</p>
           <h2 id="detailTitle">Submission Details</h2>
         </div>
-
-        <button id="closeDetailModal" class="close-modal">×</button>
+        <button id="closeDetailModal" class="close-modal" aria-label="Close">×</button>
       </div>
-
       <div id="detailContent" class="detail-content"></div>
     </div>
   </div>
 
-  <script>
-    window.showToast = function (message) {
-      alert(message);
-    };
-  </script>
+  <!-- CONFIRM DIALOG -->
+  <div class="confirm-modal" id="confirmModal" hidden>
+    <div class="confirm-box">
+      <div class="confirm-icon" id="confirmIcon">!</div>
+      <h3 id="confirmTitle">Are you sure?</h3>
+      <p id="confirmText"></p>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-light" id="confirmCancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Yes, continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
   <script type="module" src="../assets/js/admin.js"></script>
 </body>

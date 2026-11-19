@@ -971,957 +971,427 @@
         }
 
     </style>
+    <style>
+        /* ===== Added: states, support box, actions ===== */
+        .success-check.pending { background:#e08a12; box-shadow:0 15px 35px rgba(224,138,18,.25); }
+        .success-check.pending::after { content:''; }
+        .success-kicker.pending { color:#c27508; }
+        .confirm-spinner { width:46px;height:46px;margin:0 auto 16px;border-radius:50%;border:4px solid #e6eef1;
+            border-top-color:#11845f;animation:seSpin .8s linear infinite; }
+        @keyframes seSpin { to { transform:rotate(360deg); } }
+        .order-state { padding:45px 24px; text-align:center; }
+        .order-state h2 { margin:0 0 8px; color:#08121b; font-size:22px; }
+        .order-state p { margin:0 auto; max-width:560px; color:#5d6b75; font-size:14px; line-height:1.7; }
+        .order-state .ref-chip { display:inline-block; margin-top:14px; padding:8px 14px; border-radius:8px;
+            background:#f2f5f7; font-family:monospace; font-size:13px; color:#17232c; word-break:break-all; }
+        .state-warning { background:#fff8ec; border:1px solid #f4dcb0; border-radius:12px; padding:18px; margin:22px auto 0;
+            max-width:600px; color:#7a4d06; font-size:13px; line-height:1.6; text-align:left; }
+
+        .support-box { margin-top:28px; display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:center;
+            padding:26px 28px; border-radius:18px; background:#08121b; color:#fff;
+            box-shadow:0 20px 50px rgba(8,18,27,.18); }
+        .support-box h3 { margin:0 0 6px; font-size:19px; color:#fff; }
+        .support-box p { margin:0; color:#aeb8bf; font-size:13px; line-height:1.6; }
+        .support-box .support-ref { margin-top:10px; color:#fff; font-size:12px; }
+        .support-actions { display:grid; gap:10px; }
+        .support-actions a { display:flex; align-items:center; justify-content:center; gap:8px; min-height:46px;
+            border-radius:10px; font-weight:800; font-size:13px; text-decoration:none; transition:.2s ease; }
+        .support-actions a:hover { transform:translateY(-2px); }
+        .support-actions .call { background:#ee372f; color:#fff; }
+        .support-actions .wa { background:#11845f; color:#fff; }
+        .support-actions .mail { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); }
+
+        .success-btn.ghost { background:#fff; color:#08121b; border:1px solid #dfe5e8; cursor:pointer; }
+
+        @media (max-width:800px) { .support-box { grid-template-columns:1fr; } }
+        @media print {
+            #siteHeader, #siteFooter, .success-actions, .support-actions { display:none !important; }
+            .support-box { background:#fff; color:#000; box-shadow:none; border:1px solid #ddd; }
+            .support-box p, .support-box h3 { color:#000; }
+        }
+    </style>
 
 </head>
 
-
 <body>
 
-
-    <!-- HEADER -->
     <div id="siteHeader"></div>
 
-
     <main>
-
-
         <section class="success-page">
-
-
             <div class="success-container">
 
-
-                <!-- =================================================
-                     SUCCESS
-                ================================================== -->
-
                 <div class="success-header">
-
-                    <div class="success-check">
-                        ✓
-                    </div>
-
-                    <p class="success-kicker">
-                        Payment Confirmed
+                    <div class="success-check" id="successIcon">✓</div>
+                    <p class="success-kicker" id="successKicker">Payment Confirmed</p>
+                    <h1 id="successTitle">Thank You for Your Order!</h1>
+                    <p id="successText">
+                        Congratulations! Your payment has been successfully confirmed
+                        and we have received your SAFE ESCAPE order.
                     </p>
-
-                    <h1>
-                        Thank You for Your Order!
-                    </h1>
-
-                    <p>
-                        Congratulations! Your payment has been successfully
-                        confirmed and we have received your SAFE ESCAPE order.
-                    </p>
-
                 </div>
 
-
-
-                <!-- =================================================
-                     ORDER DETAILS
-                ================================================== -->
-
-                <div
-                    class="order-card"
-                    id="orderDetails"
-                >
-
-                    <div class="order-loading">
-                        Loading your order details…
+                <div class="order-card" id="orderDetails">
+                    <div class="order-state">
+                        <div class="confirm-spinner"></div>
+                        <p>Loading your order details…</p>
                     </div>
-
                 </div>
 
-
-
-                <!-- =================================================
-                     ACTIONS
-                ================================================== -->
+                <!-- SUPPORT -->
+                <div class="support-box" id="supportBox">
+                    <div>
+                        <h3>Need help with your order?</h3>
+                        <p>
+                            If your payment went through but something looks wrong, or you have
+                            any question about delivery or installation — call or WhatsApp us.
+                            Our team will help you right away.
+                        </p>
+                        <p class="support-ref" id="supportRef"></p>
+                    </div>
+                    <div class="support-actions" id="supportActions"></div>
+                </div>
 
                 <div class="success-actions">
-
-                    <a
-                        href="index.html"
-                        class="success-btn primary"
-                    >
-                        BACK TO HOME →
-                    </a>
-
+                    <a href="index.html" class="success-btn primary">BACK TO HOME →</a>
+                    <a href="products.html" class="success-btn secondary">CONTINUE SHOPPING</a>
+                    <button type="button" class="success-btn ghost" id="printOrder">PRINT ORDER DETAILS</button>
                 </div>
 
-
             </div>
-
-
         </section>
-
-
     </main>
 
-
-    <!-- FOOTER -->
     <div id="siteFooter"></div>
-
 
     <script src="assets/js/components.js"></script>
 
-
-    <!-- SUCCESS PAGE JS -->
     <script type="module">
 
-        import {
-            firebaseConfig
-        } from './assets/js/firebase-config.js';
+        import { functionsBaseUrl } from './assets/js/firebase-config.js';
 
+        const SUPPORT = {
+            phone: '+91 93116 05588',
+            tel: '+919311605588',
+            whatsapp: '919311605588',
+            email: 'safeescapesolutions@gmail.com'
+        };
 
-        import {
-            initializeApp
-        } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+        const PENDING_KEY = 'safeEscapePendingPayment';
+        const LAST_ORDER_KEY = 'safeEscapeLastOrder';
+        const endpoint = path => (functionsBaseUrl || '') + path;
 
+        const container = document.querySelector('#orderDetails');
+        const params = new URLSearchParams(location.search);
+        const orderRef = params.get('order') || '';
+        const urlOrderNumber = params.get('orderNo') || '';
+        const isPending = params.get('pending') === '1';
 
-        import {
-            getFirestore,
-            doc,
-            getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+        document.querySelector('#printOrder')?.addEventListener('click', () => window.print());
 
+        /* ---------------- helpers ---------------- */
 
+        const esc = v => String(v ?? '').replace(/[&<>'"]/g, c => ({
+            '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+        }[c]));
 
-        /* =========================================================
-           FIREBASE
-        ========================================================= */
-
-        const app =
-            initializeApp(firebaseConfig);
-
-
-        const db =
-            getFirestore(app);
-
-
-
-        /* =========================================================
-           ELEMENT
-        ========================================================= */
-
-        const container =
-            document.querySelector(
-                '#orderDetails'
-            );
-
-
-
-        /* =========================================================
-           HELPERS
-        ========================================================= */
-
-        function escapeHTML(value) {
-
-            return String(value ?? '')
-                .replaceAll('&', '&amp;')
-                .replaceAll('<', '&lt;')
-                .replaceAll('>', '&gt;')
-                .replaceAll('"', '&quot;')
-                .replaceAll("'", '&#039;');
-
-        }
-
-
-        function money(value) {
-
-            return new Intl.NumberFormat(
-                'en-IN',
-                {
-                    style:
-                        'currency',
-
-                    currency:
-                        'INR',
-
-                    maximumFractionDigits:
-                        0
-                }
-            ).format(
-                Number(value) || 0
-            );
-
-        }
-
+        const money = v => new Intl.NumberFormat('en-IN', {
+            style:'currency', currency:'INR', maximumFractionDigits:0
+        }).format(Number(v) || 0);
 
         function formatDate(value) {
-
-            if (!value) {
-
-                return new Date()
-                    .toLocaleDateString(
-                        'en-IN'
-                    );
-
-            }
-
-
-            try {
-
-                const date =
-                    typeof value.toDate === 'function'
-                        ? value.toDate()
-                        : new Date(value);
-
-
-                return date.toLocaleDateString(
-                    'en-IN',
-                    {
-                        day:
-                            '2-digit',
-
-                        month:
-                            'short',
-
-                        year:
-                            'numeric'
-                    }
-                );
-
-            }
-
-            catch {
-
-                return '';
-            }
-
+            const d = value ? new Date(value) : new Date();
+            return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
         }
 
+        function readJSON(storage, key) {
+            try { return JSON.parse(storage.getItem(key) || 'null'); } catch { return null; }
+        }
 
+        function setHeader(state) {
+            const icon = document.querySelector('#successIcon');
+            const kicker = document.querySelector('#successKicker');
+            const title = document.querySelector('#successTitle');
+            const text = document.querySelector('#successText');
 
-        /* =========================================================
-           GET ORDER ID
-        ========================================================= */
+            if (state === 'confirming') {
+                icon.className = 'success-check pending'; icon.textContent = '…';
+                kicker.className = 'success-kicker pending'; kicker.textContent = 'Payment Received';
+                title.textContent = 'Confirming your order…';
+                text.textContent = 'Your payment was received. We are confirming it with the bank — this usually takes only a few seconds. Please do not pay again.';
+            } else if (state === 'delayed') {
+                icon.className = 'success-check pending'; icon.textContent = '!';
+                kicker.className = 'success-kicker pending'; kicker.textContent = 'Payment Received';
+                title.textContent = 'Your order is being confirmed';
+                text.textContent = 'Your payment reached us, but confirmation is taking longer than usual. Your money is safe — please do not pay again. Our team will confirm your order shortly, or you can call us now.';
+            } else {
+                icon.className = 'success-check'; icon.textContent = '✓';
+                kicker.className = 'success-kicker'; kicker.textContent = 'Payment Confirmed';
+                title.textContent = 'Thank You for Your Order!';
+                text.textContent = 'Congratulations! Your payment has been successfully confirmed and we have received your SAFE ESCAPE order.';
+            }
+        }
 
-        const params =
-            new URLSearchParams(
-                window.location.search
+        function renderSupport({ orderNo = '', paymentId = '', issue = '' } = {}) {
+            const ref = orderNo || orderRef;
+            const msg = encodeURIComponent(
+                'Hello SAFE ESCAPE, I need help with my order.\n' +
+                (ref ? `Order: ${ref}\n` : '') +
+                (paymentId ? `Payment ID: ${paymentId}\n` : '') +
+                (issue ? `Issue: ${issue}` : '')
             );
+            const subject = encodeURIComponent(`Order help - ${ref || 'SAFE ESCAPE'}`);
 
+            document.querySelector('#supportRef').innerHTML = ref
+                ? `Please share your reference: <b>${esc(ref)}</b>${paymentId ? ` · Payment ID: <b>${esc(paymentId)}</b>` : ''}`
+                : '';
 
-        const orderId =
-            params.get('order');
+            document.querySelector('#supportActions').innerHTML = `
+                <a class="call" href="tel:${SUPPORT.tel}">📞 Call ${SUPPORT.phone}</a>
+                <a class="wa" href="https://wa.me/${SUPPORT.whatsapp}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp Support</a>
+                <a class="mail" href="mailto:${SUPPORT.email}?subject=${subject}&body=${msg}">✉ ${SUPPORT.email}</a>
+            `;
+        }
 
+        /* ---------------- automation (runs silently) ----------------
+           Shiprocket + Google Sheet + PDF invoice + email.
+           Customer already sees the Thank You page; this never blocks it.
+        -------------------------------------------------------------- */
 
-        const urlOrderNumber =
-            params.get('orderNo');
+        async function runAutomation(ref, token) {
+            if (!ref || !token) return;
+            const flag = `seAutomation_${ref}`;
+            if (sessionStorage.getItem(flag)) return;
+            sessionStorage.setItem(flag, '1');
 
+            const call = step => fetch(endpoint('/process-order'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderRef: ref, orderToken: token, step }),
+                keepalive: true
+            }).catch(err => console.warn('Automation step failed:', step, err));
 
-        if (!orderId) {
+            await call('shipping');
+            await call('documents');
+        }
 
+        /* ---------------- verify (retry from this page) ---------------- */
+
+        async function verifyOnce(payload) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 15000);
+            try {
+                const res = await fetch(endpoint('/verify-razorpay-payment'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) return { ok: true, data };
+                return { ok: false, final: [400, 403, 404].includes(res.status), message: data.message };
+            } catch (e) {
+                return { ok: false, final: false, message: e.message };
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function confirmPending(payload) {
+            setHeader('confirming');
             container.innerHTML = `
-
-                <div class="order-error">
-
-                    We could not find an order reference
-                    in this page URL.
-
-                </div>
-
-            `;
-
-        }
-
-        else {
-
-            loadOrder();
-
-        }
-
-
-
-        /* =========================================================
-           LOAD ORDER FROM FIRESTORE
-        ========================================================= */
-
-     async function loadOrder() {
-
-    container.innerHTML = `
-
-        <div class="order-body">
-
-            <div class="order-error">
-
-                <strong style="
-                    display:block;
-                    font-size:24px;
-                    color:#08121b;
-                    margin-bottom:12px;
-                ">
-                    Thank You for Your Order!
-                </strong>
-
-                <span style="
-                    display:block;
-                    color:#11845f;
-                    font-weight:700;
-                    margin-bottom:18px;
-                ">
-                    ✓ Your payment has been confirmed successfully.
-                </span>
-
-                <strong>
-                    Order No:
-                </strong>
-
-                ${
-                    escapeHTML(
-                        urlOrderNumber ||
-                        orderId
-                    )
-                }
-
-                <br><br>
-
-                Your order has been received successfully.
-
-                <br><br>
-
-                Complete order details and your invoice will be
-                sent to your registered email address.
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-        /* =========================================================
-           RENDER ORDER
-        ========================================================= */
-
-        function renderOrder(order) {
-
-
-            const customer =
-                order.customer || {};
-
-
-            const pricing =
-                order.pricing || {};
-
-
-            const cart =
-                order.cart || {};
-
-
-            const shipping =
-                order.shipping || {};
-
-
-            const orderNumber =
-                order.orderNumber ||
-                urlOrderNumber ||
-                orderId;
-
-
-            const paymentStatus =
-                String(
-                    order.status ||
-                    'paid'
-                ).toUpperCase();
-
-
-            /* =====================================================
-               PRODUCT ITEMS
-            ====================================================== */
-
-            let itemsHTML = `
-
-                <div class="product-row">
-
-                    <div class="product-info">
-
-                        <strong>
-                            SAFE ESCAPE
-                        </strong>
-
-                        <span>
-                            ${
-                                escapeHTML(
-                                    cart.length || ''
-                                )
-                            } metre
-                            ×
-                            ${
-                                escapeHTML(
-                                    cart.quantity || 1
-                                )
-                            }
-                        </span>
-
-                    </div>
-
-                    <div class="product-price">
-
-                        ${
-                            money(
-                                pricing.product
-                            )
-                        }
-
-                    </div>
-
-                </div>
-
-            `;
-
-
-
-            /* ACCESSORIES */
-
-            if (
-                Array.isArray(
-                    cart.accessories
-                )
-            ) {
-
-                cart.accessories.forEach(
-                    accessory => {
-
-
-                        itemsHTML += `
-
-                            <div class="product-row">
-
-                                <div class="product-info">
-
-                                    <strong>
-                                        ${
-                                            escapeHTML(
-                                                accessory.name
-                                            )
-                                        }
-                                    </strong>
-
-                                    <span>
-                                        Quantity:
-                                        ${
-                                            escapeHTML(
-                                                accessory.quantity || 1
-                                            )
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div class="product-price">
-
-                                    ${
-                                        money(
-                                            Number(
-                                                accessory.price || 0
-                                            )
-                                            *
-                                            Number(
-                                                accessory.quantity || 1
-                                            )
-                                        )
-                                    }
-
-                                </div>
-
-                            </div>
-
-                        `;
-
-                    }
-                );
-
+                <div class="order-state">
+                    <div class="confirm-spinner"></div>
+                    <h2>Confirming your payment…</h2>
+                    <p>Please keep this page open. This usually takes a few seconds.</p>
+                    <span class="ref-chip">Payment ID: ${esc(payload.razorpay_payment_id)}</span>
+                </div>`;
+
+            let last;
+            for (let i = 0; i < 5; i++) {
+                last = await verifyOnce(payload);
+                if (last.ok || last.final) break;
+                await new Promise(r => setTimeout(r, 2500));
             }
 
+            if (last?.ok) {
+                const order = { ...last.data.order, orderRef: payload.orderRef, orderToken: payload.orderToken };
+                try {
+                    sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
+                    localStorage.removeItem(PENDING_KEY);
+                } catch {}
+                history.replaceState(null, '',
+                    `?order=${encodeURIComponent(payload.orderRef)}&orderNo=${encodeURIComponent(order.orderNumber || '')}`);
+                showOrder(order);
+                runAutomation(payload.orderRef, payload.orderToken);
+                return;
+            }
 
+            showDelayed(payload, last?.message);
+        }
 
-            /* =====================================================
-               INSTALLATION ADDRESS
-            ====================================================== */
+        function showDelayed(payload, reason) {
+            setHeader('delayed');
+            renderSupport({ paymentId: payload.razorpay_payment_id, issue: 'Payment done but order confirmation is delayed' });
+            container.innerHTML = `
+                <div class="order-state">
+                    <h2>We have received your payment</h2>
+                    <p>
+                        Confirmation is taking longer than usual. <b>Your money is safe.</b>
+                        Our team checks every payment manually as well, and will confirm your
+                        order by phone / email shortly.
+                    </p>
+                    <span class="ref-chip">Order Ref: ${esc(payload.orderRef)}</span><br>
+                    <span class="ref-chip">Payment ID: ${esc(payload.razorpay_payment_id)}</span>
+                    <div class="state-warning">
+                        ⚠ Please <b>do not pay again</b>. If you need urgent help, call
+                        <b>${SUPPORT.phone}</b> or WhatsApp us using the buttons below and
+                        share the Payment ID above.
+                    </div>
+                    <p style="margin-top:18px">
+                        <button type="button" class="success-btn ghost" id="retryConfirm">TRY CONFIRMING AGAIN</button>
+                    </p>
+                </div>`;
+            document.querySelector('#retryConfirm')?.addEventListener('click', () => confirmPending(payload));
+            if (reason) console.warn('Verification issue:', reason);
+        }
 
-            const installationAddress =
-                customer.installationAddress ||
-                customer.address ||
-                '—';
+        /* ---------------- render full order ---------------- */
 
+        function showOrder(order) {
+            setHeader('confirmed');
 
+            const customer = order.customer || {};
+            const pricing = order.pricing || {};
+            const cart = order.cart || {};
+            const orderNumber = order.orderNumber || urlOrderNumber || orderRef;
 
-            /* =====================================================
-               HTML
-            ====================================================== */
+            renderSupport({ orderNo: orderNumber, paymentId: order.razorpayPaymentId });
+
+            const accessories = Array.isArray(cart.accessories) ? cart.accessories : [];
+            const itemsHTML = `
+                <div class="product-row">
+                    <div class="product-info">
+                        <strong>SAFE ESCAPE</strong>
+                        <span>${esc(cart.length || '')} metre × ${esc(cart.quantity || 1)}</span>
+                    </div>
+                    <div class="product-price">${money(pricing.product)}</div>
+                </div>
+                ${accessories.map(a => `
+                    <div class="product-row">
+                        <div class="product-info">
+                            <strong>${esc(a.name)}</strong>
+                            <span>Quantity: ${esc(a.quantity || 1)}</span>
+                        </div>
+                        <div class="product-price">${money(Number(a.price || 0) * Number(a.quantity || 1))}</div>
+                    </div>`).join('')}
+            `;
+
+            const billing = [customer.city, customer.state].filter(Boolean).map(esc).join(', ') +
+                (customer.pincode ? ' - ' + esc(customer.pincode) : '');
 
             container.innerHTML = `
-
-
-                <!-- =============================================
-                     TOP SUMMARY
-                ============================================== -->
-
                 <div class="order-top">
-
-
-                    <div class="order-top-item">
-
-                        <span>
-                            Order Number
-                        </span>
-
-                        <strong>
-                            ${
-                                escapeHTML(
-                                    orderNumber
-                                )
-                            }
-                        </strong>
-
-                    </div>
-
-
-                    <div class="order-top-item">
-
-                        <span>
-                            Payment Status
-                        </span>
-
-                        <strong class="paid-status">
-                            ✓ ${escapeHTML(paymentStatus)}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="order-top-item">
-
-                        <span>
-                            Order Date
-                        </span>
-
-                        <strong>
-                            ${
-                                formatDate(
-                                    order.paidAt ||
-                                    order.createdAt
-                                )
-                            }
-                        </strong>
-
-                    </div>
-
-
+                    <div class="order-top-item"><span>Order Number</span><strong>${esc(orderNumber)}</strong></div>
+                    <div class="order-top-item"><span>Payment Status</span><strong class="paid-status">✓ PAID</strong></div>
+                    <div class="order-top-item"><span>Order Date</span><strong>${formatDate(order.paidAt || order.createdAt)}</strong></div>
                 </div>
-
-
 
                 <div class="order-body">
-
-
                     <div class="order-grid">
-
-
-                        <!-- =====================================
-                             LEFT
-                        ====================================== -->
-
                         <div>
-
-
-                            <!-- ORDER -->
-
                             <section class="order-section">
-
-                                <h2 class="section-heading">
-                                    Order Details
-                                </h2>
-
+                                <h2 class="section-heading">Order Details</h2>
                                 ${itemsHTML}
-
                             </section>
-
-
-
-                            <!-- CUSTOMER -->
 
                             <section class="order-section">
-
-                                <h2 class="section-heading">
-                                    Customer Details
-                                </h2>
-
-
+                                <h2 class="section-heading">Customer Details</h2>
                                 <div class="customer-grid">
-
-
-                                    <div class="detail-box">
-
-                                        <span>
-                                            Customer Name
-                                        </span>
-
-                                        <strong>
-                                            ${
-                                                escapeHTML(
-                                                    customer.fullName ||
-                                                    '—'
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div class="detail-box">
-
-                                        <span>
-                                            Mobile Number
-                                        </span>
-
-                                        <strong>
-                                            ${
-                                                escapeHTML(
-                                                    customer.mobile ||
-                                                    '—'
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div class="detail-box full">
-
-                                        <span>
-                                            Registered Email
-                                        </span>
-
-                                        <strong>
-                                            ${
-                                                escapeHTML(
-                                                    customer.email ||
-                                                    '—'
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    ${
-                                        customer.companyName
-                                        ? `
-
-                                            <div class="detail-box">
-
-                                                <span>
-                                                    Company
-                                                </span>
-
-                                                <strong>
-                                                    ${
-                                                        escapeHTML(
-                                                            customer.companyName
-                                                        )
-                                                    }
-                                                </strong>
-
-                                            </div>
-
-                                        `
-                                        : ''
-                                    }
-
-
-                                    ${
-                                        customer.companyGST
-                                        ? `
-
-                                            <div class="detail-box">
-
-                                                <span>
-                                                    GSTIN
-                                                </span>
-
-                                                <strong>
-                                                    ${
-                                                        escapeHTML(
-                                                            customer.companyGST
-                                                        )
-                                                    }
-                                                </strong>
-
-                                            </div>
-
-                                        `
-                                        : ''
-                                    }
-
-
-                                    <div class="detail-box full">
-
-                                        <span>
-                                            Billing Address
-                                        </span>
-
-                                        <p>
-
-                                            ${
-                                                escapeHTML(
-                                                    customer.address ||
-                                                    '—'
-                                                )
-                                            }
-
-                                            <br>
-
-                                            ${
-                                                escapeHTML(
-                                                    customer.city ||
-                                                    ''
-                                                )
-                                            }
-
-                                            ${
-                                                customer.state
-                                                ? ', ' +
-                                                  escapeHTML(
-                                                      customer.state
-                                                  )
-                                                : ''
-                                            }
-
-                                            ${
-                                                customer.pincode
-                                                ? ' - ' +
-                                                  escapeHTML(
-                                                      customer.pincode
-                                                  )
-                                                : ''
-                                            }
-
-                                        </p>
-
-                                    </div>
-
-
-                                    <div class="detail-box full">
-
-                                        <span>
-                                            Installation Address
-                                        </span>
-
-                                        <p>
-                                            ${
-                                                escapeHTML(
-                                                    installationAddress
-                                                )
-                                            }
-                                        </p>
-
-                                    </div>
-
-
+                                    <div class="detail-box"><span>Customer Name</span><strong>${esc(customer.fullName || '—')}</strong></div>
+                                    <div class="detail-box"><span>Mobile Number</span><strong>${esc(customer.mobile || '—')}</strong></div>
+                                    <div class="detail-box full"><span>Registered Email</span><strong>${esc(customer.email || '—')}</strong></div>
+                                    ${customer.companyName ? `<div class="detail-box"><span>Company</span><strong>${esc(customer.companyName)}</strong></div>` : ''}
+                                    ${customer.companyGST ? `<div class="detail-box"><span>GSTIN</span><strong>${esc(customer.companyGST)}</strong></div>` : ''}
+                                    <div class="detail-box full"><span>Billing Address</span>
+                                        <p>${esc(customer.address || '—')}<br>${billing}</p></div>
+                                    <div class="detail-box full"><span>Installation Address</span>
+                                        <p>${esc(customer.installationAddress || customer.address || '—')}</p></div>
                                 </div>
-
                             </section>
-
-
                         </div>
-
-
-
-                        <!-- =====================================
-                             RIGHT
-                        ====================================== -->
 
                         <div>
-
-
                             <section class="order-section">
-
-                                <h2 class="section-heading">
-                                    Payment Summary
-                                </h2>
-
-
+                                <h2 class="section-heading">Payment Summary</h2>
                                 <div class="price-card">
-
-
-                                    <div class="price-row">
-
-                                        <span>
-                                            Subtotal
-                                        </span>
-
-                                        <strong>
-                                            ${
-                                                money(
-                                                    pricing.subtotal
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div class="price-row discount">
-
-                                        <span>
-                                            Bulk Discount
-                                        </span>
-
-                                        <strong>
-                                            −${
-                                                money(
-                                                    pricing.bulk
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div class="price-row discount">
-
-                                        <span>
-                                            Coupon Discount
-                                        </span>
-
-                                        <strong>
-                                            −${
-                                                money(
-                                                    pricing.couponDiscount
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
-                                    <div class="price-total">
-
-                                        <span>
-                                            Amount Paid
-                                        </span>
-
-                                        <strong>
-                                            ${
-                                                money(
-                                                    pricing.total
-                                                )
-                                            }
-                                        </strong>
-
-                                    </div>
-
-
+                                    <div class="price-row"><span>Subtotal</span><strong>${money(pricing.subtotal)}</strong></div>
+                                    <div class="price-row discount"><span>Bulk Discount</span><strong>−${money(pricing.bulk)}</strong></div>
+                                    <div class="price-row discount"><span>Coupon Discount${cart.couponCode ? ` (${esc(cart.couponCode)})` : ''}</span><strong>−${money(pricing.couponDiscount)}</strong></div>
+                                    <div class="price-total"><span>Amount Paid</span><strong>${money(pricing.total)}</strong></div>
                                 </div>
 
+                                ${order.invoiceNumber ? `
+                                <div class="shipping-card"><span>Invoice Number</span><strong>${esc(order.invoiceNumber)}</strong></div>` : ''}
 
-                                <div class="shipping-card">
+                                ${order.razorpayPaymentId ? `
+                                <div class="shipping-card"><span>Payment ID</span><strong style="text-transform:none">${esc(order.razorpayPaymentId)}</strong></div>` : ''}
 
-                                    <span>
-                                        Shipping Status
-                                    </span>
-
-                                    <strong>
-                                        ${
-                                            escapeHTML(
-                                                shipping.status ||
-                                                'Processing'
-                                            )
-                                        }
-                                    </strong>
-
-                                </div>
-
-
-                                ${
-                                    order.invoiceNumber
-                                    ? `
-
-                                        <div class="shipping-card">
-
-                                            <span>
-                                                Invoice Number
-                                            </span>
-
-                                            <strong>
-                                                ${
-                                                    escapeHTML(
-                                                        order.invoiceNumber
-                                                    )
-                                                }
-                                            </strong>
-
-                                        </div>
-
-                                    `
-                                    : ''
-                                }
-
-
+                                <div class="shipping-card"><span>Shipping Status</span><strong>Processing — tracking will be shared soon</strong></div>
                             </section>
-
-
                         </div>
-
-
                     </div>
-
-
-
-                    <!-- =========================================
-                         EMAIL INFORMATION
-                    ========================================== -->
 
                     <div class="email-notice">
-
-
-                        <div class="email-icon">
-                            ✉
-                        </div>
-
-
+                        <div class="email-icon">✉</div>
                         <div>
-
-                            <strong>
-                                Order confirmation & invoice
-                            </strong>
-
+                            <strong>Order confirmation & invoice</strong>
                             <p>
-
-                                Your order has been successfully confirmed.
-                                Your complete order details and invoice will
-                                be sent to your registered email address
-
-                                ${
-                                    customer.email
-                                    ? `<strong>${escapeHTML(customer.email)}</strong>`
-                                    : ''
-                                }
-
-                                as soon as possible.
-
+                                Your complete order details and GST invoice (PDF) are being sent to
+                                ${customer.email ? `<b>${esc(customer.email)}</b>` : 'your registered email'}.
+                                It usually arrives within a few minutes — please also check your Spam / Promotions folder.
                             </p>
-
                         </div>
-
-
                     </div>
-
-
                 </div>
-
             `;
+        }
 
+        function showBasic() {
+            setHeader('confirmed');
+            renderSupport({ orderNo: urlOrderNumber });
+            container.innerHTML = `
+                <div class="order-state">
+                    <h2>Your order has been received</h2>
+                    ${urlOrderNumber || orderRef ? `<span class="ref-chip">Order No: ${esc(urlOrderNumber || orderRef)}</span>` : ''}
+                    <p style="margin-top:14px">
+                        Complete order details and your invoice have been sent to your registered email address.
+                    </p>
+                </div>`;
+        }
+
+        /* ---------------- start ---------------- */
+
+        const lastOrder = readJSON(sessionStorage, LAST_ORDER_KEY);
+        const pendingPayment = readJSON(localStorage, PENDING_KEY);
+
+        if (!orderRef) {
+            renderSupport();
+            container.innerHTML = `<div class="order-state"><h2>No order reference found</h2>
+                <p>If you have just paid and landed here, please contact us with your payment details.</p></div>`;
+        }
+        else if (lastOrder && lastOrder.orderRef === orderRef && !isPending) {
+            showOrder(lastOrder);
+            runAutomation(orderRef, lastOrder.orderToken);
+        }
+        else if (pendingPayment && pendingPayment.orderRef === orderRef) {
+            confirmPending(pendingPayment);
+        }
+        else {
+            showBasic();
         }
 
     </script>
-
 
 </body>
 
