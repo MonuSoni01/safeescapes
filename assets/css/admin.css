@@ -1774,3 +1774,14 @@
 
 .data-table td.from { max-width: 140px; }
 .data-table td.cust .cell-sub { max-width: 190px; overflow-wrap: anywhere; }
+
+/* Auth splash */
+.auth-splash {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: linear-gradient(160deg, var(--navy-3), var(--navy));
+  color: #c4d1d8; font-weight: 600;
+}
+.auth-splash img { width: 170px; padding: 12px 16px; border-radius: 14px; background: rgba(255,255,255,.06); }
+.auth-splash p { margin: 0; font-size: 13px; letter-spacing: .04em; }
+.splash-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--primary); animation: spin .8s linear infinite; }

@@ -153,7 +153,13 @@ exports.handler = async (event) => {
                 }, { merge: true })
             ]);
             console.error('WARRANTY APPS SCRIPT ERROR:', script.message || script.status);
-            return fail(502, 'We could not upload your photo right now. Please try again in a minute, or contact our support team.');
+            const res = fail(502, 'We could not upload your photo right now. Please try again in a minute, or contact our support team.');
+            // Visible only in browser DevTools -> Network -> Response (no secrets inside)
+            const body = JSON.parse(res.body);
+            body.reason = script.status === 'not_configured' ? 'apps_script_not_configured' : 'apps_script_error';
+            body.detail = String(script.message || script.status).slice(0, 200);
+            res.body = JSON.stringify(body);
+            return res;
         }
 
         await regRef.set({

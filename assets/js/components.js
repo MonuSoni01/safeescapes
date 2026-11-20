@@ -849,7 +849,7 @@ window.showToast =
   document.addEventListener("keydown", function (event) {
 
     const key =
-      event.key.toLowerCase();
+      String(event.key || "").toLowerCase();
 
 
     const target =

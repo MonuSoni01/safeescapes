@@ -18,7 +18,13 @@
   <!-- ===================================================
        LOGIN
   ==================================================== -->
-  <section class="login-screen" id="adminLogin">
+  <div class="auth-splash" id="authSplash">
+    <img src="../assets/images/logo.png" alt="SAFE ESCAPE">
+    <span class="splash-spinner"></span>
+    <p>Loading dashboard…</p>
+  </div>
+
+  <section class="login-screen" id="adminLogin" hidden>
 
     <div class="login-topbar">
       <a href="../index.html" class="go-website">
@@ -319,6 +325,7 @@
             <small id="serialInfo">Upload the serial numbers of your devices so customers can register warranty.</small>
           </div>
           <div class="warranty-tool-buttons">
+            <button type="button" class="btn btn-light" id="testConnBtn">🔌 Test Connection</button>
             <button type="button" class="btn btn-light" id="sampleCsvBtn">⬇ Sample CSV</button>
             <button type="button" class="btn btn-light" id="serialListBtn">☰ View Serials</button>
             <button type="button" class="btn btn-primary" id="bulkUploadBtn">⬆ Bulk Upload Serials</button>

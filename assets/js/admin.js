@@ -288,7 +288,11 @@ $("#forgotPasswordBtn")?.addEventListener("click", async () => {
 
 $("#logoutBtn")?.addEventListener("click", async () => {
   const ok = await confirmDialog({ title: "Log out?", text: "You will need to sign in again to access the dashboard.", okText: "Log out", danger: false });
-  if (ok) signOut(auth);
+  if (ok) {
+    try { localStorage.removeItem("seAdminUid"); } catch {}
+    state.panelLoaded = false;
+    signOut(auth);
+  }
 });
 
 
@@ -296,36 +300,63 @@ $("#logoutBtn")?.addEventListener("click", async () => {
    AUTH STATE
 ========================================================= */
 
+/* Splash while Firebase restores the saved login (prevents login flash on refresh) */
+function showScreen(name) {
+  const splash = $("#authSplash");
+  if (splash) splash.hidden = name !== "splash";
+  loginBox.hidden = name !== "login";
+  adminPanel.hidden = name !== "panel";
+}
+
+const ADMIN_CACHE_KEY = "seAdminUid";
+
 onAuthStateChanged(auth, async user => {
   if (!user) {
-    loginBox.hidden = false;
-    adminPanel.hidden = true;
+    try { localStorage.removeItem(ADMIN_CACHE_KEY); } catch {}
     state.cache = {};
+    showScreen("login");
     return;
   }
+
+  const openPanel = () => {
+    showScreen("panel");
+    $("#adminEmail").textContent = user.email;
+    $(".admin-initial").textContent = (user.email || "SE").slice(0, 2).toUpperCase();
+    if (!state.panelLoaded) {
+      state.panelLoaded = true;
+      refreshCounts();
+      loadData(state.tab);
+    }
+  };
+
+  // Already verified on this device before -> open instantly, re-check in background
+  let cachedUid = null;
+  try { cachedUid = localStorage.getItem(ADMIN_CACHE_KEY); } catch {}
+  if (cachedUid === user.uid) openPanel();
 
   try {
     const adminDoc = await getDoc(doc(db, "admins", user.uid));
 
     if (!adminDoc.exists()) {
+      try { localStorage.removeItem(ADMIN_CACHE_KEY); } catch {}
+      state.panelLoaded = false;
       await signOut(auth);
       loginError("This account is not authorised as admin.");
       return;
     }
 
-    loginBox.hidden = true;
-    adminPanel.hidden = false;
-
-    $("#adminEmail").textContent = user.email;
-    $(".admin-initial").textContent = (user.email || "SE").slice(0, 2).toUpperCase();
-
-    refreshCounts();
-    loadData(state.tab);
+    try { localStorage.setItem(ADMIN_CACHE_KEY, user.uid); } catch {}
+    openPanel();
 
   } catch (error) {
-    console.error(error);
-    loginError("Could not confirm admin access. Check Admin UID and Firestore Rules.");
-    await signOut(auth);
+    // Network / temporary error: DON'T log the admin out
+    console.error("Admin check failed:", error);
+    if (cachedUid === user.uid) {
+      showToast("Connection is slow — showing dashboard, some data may not load.", "error");
+      return;
+    }
+    showScreen("login");
+    loginError("Could not confirm admin access (network issue?). Please refresh the page.");
   }
 });
 
@@ -1911,3 +1942,37 @@ async function openSerialList() {
 $("#bulkUploadBtn")?.addEventListener("click", openBulkUpload);
 $("#sampleCsvBtn")?.addEventListener("click", downloadSample);
 $("#serialListBtn")?.addEventListener("click", openSerialList);
+
+
+/* =========================================================
+   TEST CONNECTION (Netlify <-> Apps Script <-> Drive/Sheet/Mail)
+========================================================= */
+
+async function testWarrantyConnection(button) {
+  setButtonLoading(button, true, "Testing…");
+  try {
+    const d = await warrantyApi("testConnection");
+    const c = d.checks || {};
+    const sc = d.script || {};
+    const row = (label, ok, extra = "") =>
+      `<div class="info-row"><span>${escapeHtml(label)}</span>${automationBadge(ok === null ? "pending" : ok ? "done" : "failed")}${extra ? `<b style="margin-left:8px">${escapeHtml(extra)}</b>` : ""}</div>`;
+
+    openModal("WARRANTY SETUP", d.ok ? "Connection OK ✓" : "Connection problem", `
+      <div class="decision-banner ${d.ok ? "approved" : "rejected"}">${escapeHtml(d.advice || "")}</div>
+      <div class="detail-card">
+        ${row("Netlify: WARRANTY_APPS_SCRIPT_URL", c.urlSet && c.urlLooksRight)}
+        ${row("Netlify: WARRANTY_APPS_SCRIPT_SECRET", c.secretSet)}
+        ${row("Apps Script reachable + SECRET match", d.script ? Boolean(sc.success) : null, sc.success ? "" : (sc.message || ""))}
+        ${row("Google Drive permission", d.script && sc.success ? sc.drive !== false : null, sc.driveFolder || sc.driveError || "")}
+        ${row("Google Sheet permission", d.script && sc.success ? sc.sheet !== false : null, sc.sheetName || sc.sheetError || "")}
+        ${row("ADMIN_EMAIL property", d.script && sc.success ? sc.adminEmail !== "missing" : null)}
+        ${sc.mailQuota != null ? `<div class="info-row"><span>Emails left today</span><b>${escapeHtml(sc.mailQuota)}</b></div>` : ""}
+      </div>`);
+  } catch (error) {
+    showToast(error.message || "Test failed.", "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+$("#testConnBtn")?.addEventListener("click", e => testWarrantyConnection(e.currentTarget));

@@ -253,6 +253,46 @@ async function serials(db) {
 }
 
 
+async function testConnection() {
+    const url = process.env.WARRANTY_APPS_SCRIPT_URL || '';
+    const secret = process.env.WARRANTY_APPS_SCRIPT_SECRET || process.env.GOOGLE_APPS_SCRIPT_SECRET || '';
+    const checks = {
+        urlSet: Boolean(url),
+        urlLooksRight: /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url.trim()),
+        secretSet: Boolean(secret),
+        urlHasSpaces: url !== url.trim(),
+        secretHasSpaces: secret !== secret.trim()
+    };
+
+    let advice = '';
+    let script = null;
+
+    if (!checks.urlSet || !checks.secretSet) {
+        advice = 'Netlify me WARRANTY_APPS_SCRIPT_URL / WARRANTY_APPS_SCRIPT_SECRET nahi mila. Variable SAVE karo, phir Deploys -> Trigger deploy -> Deploy site.';
+    } else if (!checks.urlLooksRight) {
+        advice = 'WARRANTY_APPS_SCRIPT_URL galat lag raha hai. Wo https://script.google.com/macros/s/..../exec jaisa hona chahiye (Deploy -> Manage deployments -> Web app URL).';
+    } else {
+        script = await W.warrantyScript('ping', {}, 9000);
+        const msg = String(script.message || '');
+        if (script.success) {
+            advice = script.drive === false || script.sheet === false
+                ? 'Script connected, par Drive/Sheet permission nahi hai. Apps Script editor me "setup" function Run karke Allow karo, phir New version deploy karo.'
+                : 'Sab theek hai ✓ Warranty form ab kaam karega.';
+        } else if (/unauthori/i.test(msg)) {
+            advice = 'SECRET match nahi kar raha. Apps Script -> Project Settings -> Script Properties me SECRET aur Netlify ka WARRANTY_APPS_SCRIPT_SECRET bilkul same hone chahiye (koi space nahi). Change ke baad Netlify redeploy karo.';
+        } else if (/invalid response/i.test(msg)) {
+            advice = 'Apps Script HTML page bhej raha hai (JSON nahi). Deploy -> Manage deployments -> Edit: "Execute as: Me" aur "Who has access: Anyone" rakho, Version: New version -> Deploy. Aur "setup" function ek baar Run karke permission Allow karo.';
+        } else if (script.status === 'submitted') {
+            advice = 'Apps Script bahut slow reply kar raha hai (9 sec se zyada). Thodi der baad dobara test karo.';
+        } else {
+            advice = 'Apps Script error: ' + msg;
+        }
+    }
+
+    return { checks, script, advice, ok: Boolean(script && script.success && script.drive !== false && script.sheet !== false) };
+}
+
+
 async function deleteSerial(db, serialNumber) {
     const ref = db.collection('serialNumbers').doc(W.serialKey(serialNumber));
     const snap = await ref.get();
@@ -295,6 +335,7 @@ exports.handler = async (event) => {
             case 'uploadSerials': data = await uploadSerials(db, body.rows, adminUser); break;
             case 'serials': data = await serials(db); break;
             case 'deleteSerial': data = await deleteSerial(db, body.serialNumber); break;
+            case 'testConnection': data = await testConnection(); break;
             default: return json(400, { success: false, message: 'Unknown action.' });
         }
 
