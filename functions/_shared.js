@@ -114,7 +114,7 @@ async function validateCoupon(db, code, amount) {
 async function serverPrice(db, cart={}) {
   const idx=Math.min(Math.max(Math.floor(Number(cart.floorIndex)||0),0),floorLengths.length-1);
   const qty=Math.max(1,Math.floor(Number(cart.quantity)||1));
-   const unit = 1; // Testing price: ₹1
+  const unit=49999+idx*1250;
   const items=[]; let extras=0;
   for(const row of Array.isArray(cart.accessories)?cart.accessories:[]) {
     const item=accessoryCatalog[row?.id]; if(!item) continue;
@@ -123,7 +123,20 @@ async function serverPrice(db, cart={}) {
   }
   const product=unit*qty, subtotal=product+extras, bulk=qty>=5?Math.round(product*.10):0;
   const coupon=await validateCoupon(db,cart.couponCode,subtotal-bulk);
-  return {floorIndex:idx,length:floorLengths[idx],quantity:qty,unit,items,product,extras,subtotal,bulk,couponCode:coupon.code,couponDiscount:coupon.discount,total:Math.max(0,subtotal-bulk-coupon.discount)};
+  const pricing={floorIndex:idx,length:floorLengths[idx],quantity:qty,unit,items,product,extras,subtotal,bulk,couponCode:coupon.code,couponDiscount:coupon.discount,total:Math.max(0,subtotal-bulk-coupon.discount)};
+
+  /* ---------- TESTING MODE ----------
+     Netlify → Site configuration → Environment variables:
+       TEST_PAYMENT_AMOUNT = 1     → every order charges ₹1
+     Delete the variable (and redeploy) to go back to real prices.
+  ------------------------------------ */
+  const testAmount=Number(process.env.TEST_PAYMENT_AMOUNT||0);
+  if(testAmount>0){
+    pricing.originalTotal=pricing.total;
+    pricing.total=Math.round(testAmount);
+    pricing.testMode=true;
+  }
+  return pricing;
 }
 
 module.exports={

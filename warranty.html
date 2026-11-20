@@ -493,6 +493,38 @@
         width: 100%;
     }
 }
+
+        /* ===== Warranty: inline hints, preview, popup ===== */
+        .field-hint { display:none; margin-top:6px; font-size:12px; font-weight:700; line-height:1.5; color:#d32f2f; }
+        .field-hint.show { display:block; }
+        .field-hint.ok { color:#11845f; }
+        .field-hint button { margin-left:4px; padding:0; border:0; background:none; color:#2367ab; font:inherit; text-decoration:underline; cursor:pointer; }
+        .field.has-error input, .field.has-error select, .field.has-error textarea { border-color:#d32f2f !important; box-shadow:0 0 0 3px rgba(211,47,47,.12); }
+
+        .photo-preview { display:flex; align-items:center; gap:12px; margin-top:10px; padding:8px; border:1px solid #e1e7eb; border-radius:8px; background:#f7f9fb; }
+        .photo-preview[hidden] { display:none; }
+        .photo-preview img { width:72px; height:72px; object-fit:cover; border-radius:6px; }
+        .photo-preview span { font-size:12px; color:#4c5d67; word-break:break-all; }
+
+        .wr-modal { position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;
+            background:rgba(8,18,27,.7); backdrop-filter:blur(5px); }
+        .wr-modal[hidden] { display:none; }
+        .wr-box { position:relative; width:min(480px,100%); max-height:calc(100vh - 40px); overflow:auto; padding:34px 28px 26px; border-radius:18px;
+            background:#fff; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.35); animation:wrPop .25s ease; }
+        @keyframes wrPop { from { opacity:0; transform:translateY(14px) scale(.97); } to { opacity:1; transform:none; } }
+        .wr-close { position:absolute; top:12px; right:12px; width:36px; height:36px; border:0; border-radius:50%; background:#f2f5f7; font-size:20px; cursor:pointer; }
+        .wr-icon { width:74px; height:74px; margin:0 auto 18px; display:flex; align-items:center; justify-content:center; border-radius:50%;
+            background:#11845f; color:#fff; font-size:36px; font-weight:900; box-shadow:0 14px 30px rgba(17,132,95,.3); }
+        .wr-box h3 { margin:0 0 10px; font-size:23px; color:#08121b; }
+        .wr-box p { margin:0 0 10px; color:#5d6b75; font-size:14px; line-height:1.65; }
+        .wr-ref { display:inline-block; margin:6px 0 4px; padding:7px 12px; border-radius:8px; background:#f2f5f7; font-family:monospace; font-size:12px; color:#17232c; word-break:break-all; }
+        .wr-actions { display:grid; gap:10px; margin-top:20px; }
+        .wr-actions a, .wr-actions button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:46px; border-radius:10px;
+            font-weight:800; font-size:13px; text-decoration:none; border:0; cursor:pointer; }
+        .wr-actions .call { background:#ee372f; color:#fff; }
+        .wr-actions .wa { background:#11845f; color:#fff; }
+        .wr-actions .done { background:#f2f5f7; color:#08121b; }
+        .wr-actions small { color:#8a99a2; font-size:12px; }
     </style>
 
 </head>
@@ -571,7 +603,7 @@
 
                         Register your SAFE ESCAPE product within
                         <strong style="color:#fff">
-                            15 days of installation
+                            15 days of purchase
                         </strong>
                         to activate your warranty registration.
 
@@ -581,7 +613,7 @@
                     <div class="warranty-highlight__deadline">
 
                         ⏱ Registration deadline:
-                        15 calendar days from installation
+                        15 calendar days from purchase
 
                     </div>
 
@@ -612,8 +644,8 @@
 
                 <div id="warrantyError" class="warranty-error" role="alert" aria-live="assertive">
 
-                    <strong>
-                        Warranty Registration Period Expired
+                    <strong id="warrantyErrorTitle">
+                        Please check your details
                     </strong>
 
                     <span id="warrantyErrorText">
@@ -627,7 +659,7 @@
 
 
 
-                <form id="warrantyForm" data-sheet-form="warranty">
+                <form id="warrantyForm" novalidate>
 
 
                     <!-- =================================================
@@ -648,7 +680,7 @@
                                 Customer / Company Name
                             </label>
 
-                            <input name="customerName" required>
+                            <input name="customerName" maxlength="120" autocomplete="name" required>
 
                         </div>
 
@@ -660,8 +692,9 @@
                                 Mobile Number
                             </label>
 
-                            <input name="mobile" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
-                                required>
+                            <input name="mobile" type="tel" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}"
+                                placeholder="10-digit mobile number" autocomplete="tel-national" required>
+                            <small class="field-hint" data-hint="mobile"></small>
 
                         </div>
 
@@ -673,7 +706,8 @@
                                 Email Address
                             </label>
 
-                            <input type="email" name="email" required>
+                            <input type="email" name="email" maxlength="120" placeholder="you@example.com" autocomplete="email" required>
+                            <small class="field-hint" data-hint="email"></small>
 
                         </div>
 
@@ -700,7 +734,10 @@
                                 Device Serial Number
                             </label>
 
-                            <input name="serialNumber" required>
+                            <input name="serialNumber" maxlength="50" placeholder="e.g. SAFE/ESCAPE/IIZG/006" autocomplete="off"
+                                autocapitalize="characters" spellcheck="false" required>
+                            <small class="field-help">Enter the serial number exactly as printed on your SAFE ESCAPE device.</small>
+                            <small class="field-hint" data-hint="serialNumber"></small>
 
                         </div>
 
@@ -805,7 +842,7 @@
                                 Purchased From
                             </label>
 
-                            <input name="purchasedFrom" required>
+                            <input name="purchasedFrom" maxlength="150" placeholder="Dealer / shop / website name" required>
 
                         </div>
 
@@ -841,20 +878,19 @@
 
                         <div class="field">
 
-                            <label>
-                                Installation Date
+                            <label for="purchaseDate">
+                                Purchase Date
                             </label>
 
 
-                            <input id="installationDate" type="date" name="installationDate" required>
+                            <input id="purchaseDate" type="date" name="purchaseDate" required>
 
 
                             <small class="field-help">
-
                                 Warranty registration must be completed within
-                                15 calendar days of installation.
-
+                                15 calendar days of purchase.
                             </small>
+                            <small class="field-hint" data-hint="purchaseDate"></small>
 
                         </div>
 
@@ -866,7 +902,7 @@
                                 Installed By
                             </label>
 
-                            <input name="installedBy" required>
+                            <input name="installedBy" maxlength="120" placeholder="Technician / company name" required>
 
                         </div>
 
@@ -877,17 +913,21 @@
                         <div class="field full">
 
                             <label>
-                                Installed Device Photo/ Serial Number Photo
+                                Installed Device Photo
                             </label>
 
 
                             <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required>
+                            <div class="photo-preview" id="photoPreview" hidden>
+                                <img alt="Selected installed device photo">
+                                <span></span>
+                            </div>
 
 
                             <small class="field-help">
 
                                 Upload one clear photograph showing the
-                                installed SAFE ESCAPE device.
+                                installed SAFE ESCAPE device. JPG, PNG or WEBP.
 
                             </small>
 
@@ -971,6 +1011,28 @@
 
     <div id="siteFooter"></div>
 
+
+    <!-- WARRANTY SUBMITTED POPUP -->
+    <div class="wr-modal" id="warrantySuccess" hidden role="dialog" aria-modal="true" aria-labelledby="wrTitle">
+        <div class="wr-box">
+            <button type="button" class="wr-close" data-close-success aria-label="Close">×</button>
+            <div class="wr-icon">✓</div>
+            <h3 id="wrTitle">Thank you for submitting your warranty details!</h3>
+            <p>
+                Our team will verify your details and update you as soon as possible
+                on your registered email <b id="wrEmail"></b>.
+            </p>
+            <span class="wr-ref" id="wrSerial"></span>
+            <p style="margin-top:12px">
+                If you need any help or have any query, you can contact us directly.
+            </p>
+            <div class="wr-actions">
+                <a class="call" href="tel:+919311605588">📞 Contact Us: +91 93116 05588</a>
+                <a class="wa" id="wrWhatsapp" href="https://wa.me/919311605588" target="_blank" rel="noopener">💬 WhatsApp Us</a>
+                <button type="button" class="done" data-close-success>Done</button>
+            </div>
+        </div>
+    </div>
 
     <script src="assets/js/components.js"></script>
 

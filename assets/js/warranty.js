@@ -1,1745 +1,501 @@
 /* =========================================================
-   SAFE ESCAPE
-   WARRANTY REGISTRATION - FINAL
-   ---------------------------------------------------------
-   FEATURES:
-   1. Firebase Firestore integration
-   2. Serial Number verification
-   3. Invalid Serial Number protection
-   4. Inactive Serial Number protection
-   5. Duplicate warranty registration protection
-   6. 15-day installation validation
-   7. Mobile validation
-   8. Photo validation
-   9. Firebase Storage upload
-   10. Warranty registration save
-   11. Serial marked as registered
+   SAFE ESCAPE — WARRANTY REGISTRATION (Frontend)
+
+   • Live checks: mobile (10 digits), email (format + typo
+     suggestion + "are you sure" line), serial number,
+     purchase date ("are you sure" line + 15-day notice)
+   • Photo preview + compression in the browser (fast upload)
+   • Submits to Netlify function  /warranty-submit
+     (server re-checks everything, verifies serial, saves to
+     Firebase, photo -> Google Drive, row -> Google Sheet,
+     email -> customer + SAFE ESCAPE)
+   • "Thank you" popup with Contact buttons
 ========================================================= */
+
+import { functionsBaseUrl } from "./firebase-config.js";
+
+const SUPPORT = {
+    phone: "+91 93116 05588",
+    tel: "+919311605588",
+    whatsapp: "919311605588"
+};
+
+const REGISTRATION_DAYS = 15;
+
+const form = document.querySelector("#warrantyForm");
+const errorBox = document.querySelector("#warrantyError");
+const errorTitle = document.querySelector("#warrantyErrorTitle");
+const errorText = document.querySelector("#warrantyErrorText");
+const successModal = document.querySelector("#warrantySuccess");
+
+if (!form) console.error("SAFE ESCAPE: Warranty form not found.");
+
+const field = name => form?.elements.namedItem(name);
+const hint = name => form?.querySelector(`[data-hint="${name}"]`);
+const submitButton = form?.querySelector('button[type="submit"]');
+const SUBMIT_LABEL = "Submit Registration →";
 
 
 /* =========================================================
-   FIREBASE IMPORTS
+   HELPERS
 ========================================================= */
 
-import {
-    initializeApp,
-    getApps,
-    getApp
+function escapeHtml(v) {
+    return String(v ?? "").replace(/[&<>'"]/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+    }[c]));
 }
-from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 
-
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    doc,
-    getDoc,
-    updateDoc,
-    serverTimestamp
+function setHint(name, html, type = "error") {
+    const el = hint(name);
+    if (!el) return;
+    el.innerHTML = html || "";
+    el.classList.toggle("show", Boolean(html));
+    el.classList.toggle("ok", type === "ok");
 }
-from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-
-import {
-    getStorage,
-    ref,
-    uploadBytes
+function markField(name, bad) {
+    field(name)?.closest(".field")?.classList.toggle("has-error", Boolean(bad));
 }
-from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-
-import {
-    firebaseConfig
+function showError(message, title = "Please check your details") {
+    if (errorTitle) errorTitle.textContent = title;
+    if (errorText) errorText.textContent = message;
+    errorBox?.classList.add("show");
+    errorBox?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
-from "./firebase-config.js";
 
+function hideError() {
+    errorBox?.classList.remove("show");
+}
+
+function todayISO() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function parseDay(value) {
+    const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return null;
+    const d = new Date(+m[1], +m[2] - 1, +m[3]);
+    return d.getMonth() === +m[2] - 1 ? d : null;
+}
+
+function daysSince(value) {
+    const d = parseDay(value);
+    if (!d) return null;
+    const t = new Date();
+    const today = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    return Math.round((today - d) / 86400000);
+}
+
+function prettyDate(value) {
+    const d = parseDay(value);
+    return d ? d.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" }) : value;
+}
 
 
 /* =========================================================
-   ELEMENTS
+   MOBILE — exactly 10 digits, starts 6–9
 ========================================================= */
 
-const form =
-    document.querySelector("#warrantyForm");
-
-
-const installationDateInput =
-    document.querySelector("#installationDate");
-
-
-const warrantyError =
-    document.querySelector("#warrantyError");
-
-
-const warrantyErrorText =
-    document.querySelector("#warrantyErrorText");
-
-
-const serialInput =
-    form?.querySelector(
-        'input[name="serialNumber"]'
-    );
-
-
-const mobileInput =
-    form?.querySelector(
-        'input[name="mobile"]'
-    );
-
-
-const submitButton =
-    form?.querySelector(
-        'button[type="submit"]'
-    );
-
-
-
-/* =========================================================
-   STOP IF FORM DOES NOT EXIST
-========================================================= */
-
-if (!form) {
-
-    console.error(
-        "SAFE ESCAPE: Warranty form not found."
-    );
-
-}
-
-
-
-/* =========================================================
-   FIREBASE
-========================================================= */
-
-let app = null;
-let db = null;
-let storage = null;
-
-
-function initializeFirebase() {
-
-    if (
-        !firebaseConfig ||
-        !firebaseConfig.apiKey ||
-        firebaseConfig.apiKey.startsWith("YOUR_")
-    ) {
-
-        throw new Error(
-            "Firebase configuration is missing."
-        );
-
-    }
-
-
-    if (getApps().length) {
-
-        app = getApp();
-
-    } else {
-
-        app = initializeApp(
-            firebaseConfig
-        );
-
-    }
-
-
-    db =
-        getFirestore(app);
-
-
-    storage =
-        getStorage(app);
-
-}
-
-
-
-/* =========================================================
-   DATE HELPERS
-========================================================= */
-
-function getTodayLocalMidnight() {
-
-    const now =
-        new Date();
-
-
-    return new Date(
-
-        now.getFullYear(),
-
-        now.getMonth(),
-
-        now.getDate()
-
-    );
-
-}
-
-
-
-function parseLocalDate(value) {
+function checkMobile(final = false) {
+    const input = field("mobile");
+    const value = input.value;
 
     if (!value) {
-
-        return null;
-
-    }
-
-
-    const parts =
-        value.split("-");
-
-
-    if (parts.length !== 3) {
-
-        return null;
-
-    }
-
-
-    const year =
-        Number(parts[0]);
-
-
-    const month =
-        Number(parts[1]) - 1;
-
-
-    const day =
-        Number(parts[2]);
-
-
-    const date =
-        new Date(
-            year,
-            month,
-            day
-        );
-
-
-    if (
-        date.getFullYear() !== year ||
-        date.getMonth() !== month ||
-        date.getDate() !== day
-    ) {
-
-        return null;
-
-    }
-
-
-    return date;
-
-}
-
-
-
-/* =========================================================
-   DAYS SINCE INSTALLATION
-========================================================= */
-
-function getDaysSinceInstallation(
-    installationDateValue
-) {
-
-    const installationDate =
-        parseLocalDate(
-            installationDateValue
-        );
-
-
-    if (!installationDate) {
-
-        return null;
-
-    }
-
-
-    const today =
-        getTodayLocalMidnight();
-
-
-    const difference =
-        today.getTime() -
-        installationDate.getTime();
-
-
-    return Math.floor(
-
-        difference /
-        (
-            1000 *
-            60 *
-            60 *
-            24
-        )
-
-    );
-
-}
-
-
-
-/* =========================================================
-   ERROR BOX
-========================================================= */
-
-function showWarrantyError(message) {
-
-    console.error(
-        "Warranty Error:",
-        message
-    );
-
-
-    if (warrantyErrorText) {
-
-        warrantyErrorText.textContent =
-            message;
-
-    }
-
-
-    if (warrantyError) {
-
-        warrantyError.classList.add(
-            "show"
-        );
-
-
-        warrantyError.scrollIntoView({
-
-            behavior: "smooth",
-
-            block: "center"
-
-        });
-
-    }
-
-}
-
-
-
-function hideWarrantyError() {
-
-    warrantyError?.classList.remove(
-        "show"
-    );
-
-}
-
-
-
-/* =========================================================
-   TOAST / MESSAGE
-========================================================= */
-
-function showMessage(
-    message,
-    type = "success"
-) {
-
-    /*
-       If your website already has showToast(),
-       use that.
-    */
-
-    if (
-        typeof window.showToast ===
-        "function"
-    ) {
-
-        window.showToast(
-            message
-        );
-
-        return;
-
-    }
-
-
-    /*
-       Otherwise create our own toast.
-    */
-
-    let toast =
-        document.querySelector(
-            "#warrantyToast"
-        );
-
-
-    if (!toast) {
-
-        toast =
-            document.createElement(
-                "div"
-            );
-
-
-        toast.id =
-            "warrantyToast";
-
-
-        Object.assign(
-            toast.style,
-            {
-
-                position:
-                    "fixed",
-
-                left:
-                    "50%",
-
-                bottom:
-                    "30px",
-
-                transform:
-                    "translateX(-50%)",
-
-                zIndex:
-                    "99999",
-
-                maxWidth:
-                    "calc(100% - 40px)",
-
-                padding:
-                    "14px 20px",
-
-                borderRadius:
-                    "6px",
-
-                color:
-                    "#ffffff",
-
-                fontSize:
-                    "14px",
-
-                fontWeight:
-                    "700",
-
-                lineHeight:
-                    "1.5",
-
-                textAlign:
-                    "center",
-
-                boxShadow:
-                    "0 10px 30px rgba(0,0,0,.25)",
-
-                opacity:
-                    "0",
-
-                pointerEvents:
-                    "none",
-
-                transition:
-                    "opacity .25s ease"
-
-            }
-
-        );
-
-
-        document.body.appendChild(
-            toast
-        );
-
-    }
-
-
-    toast.textContent =
-        message;
-
-
-    toast.style.background =
-        type === "error"
-            ? "#c62828"
-            : "#08121b";
-
-
-    toast.style.opacity =
-        "1";
-
-
-    clearTimeout(
-        window.__warrantyToastTimer
-    );
-
-
-    window.__warrantyToastTimer =
-        setTimeout(
-            () => {
-
-                toast.style.opacity =
-                    "0";
-
-            },
-            4500
-        );
-
-}
-
-
-
-/* =========================================================
-   WARRANTY PERIOD VALIDATION
-========================================================= */
-
-function validateWarrantyPeriod() {
-
-    const dateValue =
-        installationDateInput?.value;
-
-
-    if (!dateValue) {
-
+        setHint("mobile", final ? "Please enter your 10-digit mobile number." : "");
+        markField("mobile", final);
         return false;
-
     }
-
-
-    const days =
-        getDaysSinceInstallation(
-            dateValue
-        );
-
-
-    if (days === null) {
-
-        showWarrantyError(
-            "Please enter a valid installation date."
-        );
-
+    if (!/^[6-9]/.test(value)) {
+        setHint("mobile", "Indian mobile numbers start with 6, 7, 8 or 9.");
+        markField("mobile", true);
         return false;
-
     }
-
-
-
-    /* =====================================================
-       FUTURE DATE
-    ===================================================== */
-
-    if (days < 0) {
-
-        showWarrantyError(
-            "The installation date cannot be in the future. Please enter the correct installation date."
-        );
-
+    if (value.length < 10) {
+        setHint("mobile", final ? `Mobile number must be 10 digits (you entered ${value.length}).` : "");
+        markField("mobile", final);
         return false;
-
     }
-
-
-
-    /* =====================================================
-       0 - 15 DAYS = ALLOWED
-       16+ DAYS = EXPIRED
-    ===================================================== */
-
-    if (days >= 16) {
-
-        showWarrantyError(
-            "Warranty registration period has expired. Registration must be completed within 15 calendar days of installation."
-        );
-
-        return false;
-
-    }
-
-
-    hideWarrantyError();
-
-
+    setHint("mobile", "");
+    markField("mobile", false);
     return true;
-
 }
 
+field("mobile")?.addEventListener("input", e => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    checkMobile(false);
+});
+field("mobile")?.addEventListener("blur", () => checkMobile(true));
 
 
 /* =========================================================
-   INSTALLATION DATE CHANGE
+   EMAIL — format, common typos, "are you sure" line
 ========================================================= */
 
-installationDateInput
-    ?.addEventListener(
-        "change",
-        () => {
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
-            validateWarrantyPeriod();
+const DOMAIN_FIX = {
+    "gmial.com": "gmail.com", "gamil.com": "gmail.com", "gmai.com": "gmail.com", "gmal.com": "gmail.com",
+    "gmail.co": "gmail.com", "gmail.con": "gmail.com", "gmail.cm": "gmail.com",
+    "gmaill.com": "gmail.com", "gnail.com": "gmail.com", "gmail.om": "gmail.com",
+    "yaho.com": "yahoo.com", "yahooo.com": "yahoo.com", "yahoo.con": "yahoo.com", "yaoo.com": "yahoo.com",
+    "hotmial.com": "hotmail.com", "hotmail.con": "hotmail.com", "hotmal.com": "hotmail.com",
+    "outlok.com": "outlook.com", "outlook.con": "outlook.com",
+    "rediffmail.con": "rediffmail.com", "redifmail.com": "rediffmail.com",
+    "icloud.con": "icloud.com"
+};
 
-        }
-    );
+function checkEmail(final = false) {
+    const input = field("email");
+    const value = input.value.trim().toLowerCase();
 
+    if (!value) {
+        setHint("email", final ? "Please enter your email address." : "");
+        markField("email", final);
+        return false;
+    }
 
+    if (/\s/.test(input.value.trim()) || !EMAIL_RE.test(value) || value.includes("..")) {
+        setHint("email", final || value.includes("@")
+            ? "Please enter a valid email address, e.g. name@gmail.com" : "");
+        markField("email", final);
+        return false;
+    }
 
-/* =========================================================
-   PREVENT FUTURE INSTALLATION DATE
-========================================================= */
+    const [user, domain] = value.split("@");
+    const fix = DOMAIN_FIX[domain];
 
-if (installationDateInput) {
+    if (fix) {
+        setHint("email",
+            `Did you mean <b>${escapeHtml(user)}@${escapeHtml(fix)}</b>?` +
+            `<button type="button" data-fix-email="${escapeHtml(user)}@${escapeHtml(fix)}">Yes, correct it</button>`);
+        markField("email", true);
+        return false;
+    }
 
-    const today =
-        new Date();
-
-
-    const yyyy =
-        today.getFullYear();
-
-
-    const mm =
-        String(
-            today.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const dd =
-        String(
-            today.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    installationDateInput.max =
-        `${yyyy}-${mm}-${dd}`;
-
+    markField("email", false);
+    setHint("email", `Are you sure that <b>${escapeHtml(value)}</b> is your correct email ID? Warranty updates will be sent to this email.`);
+    return true;
 }
 
+field("email")?.addEventListener("input", () => {
+    // live: only clear once it becomes valid
+    const v = field("email").value.trim();
+    if (EMAIL_RE.test(v)) checkEmail(false);
+    else { setHint("email", ""); markField("email", false); }
+});
+field("email")?.addEventListener("blur", () => checkEmail(true));
+
+form?.addEventListener("click", e => {
+    const btn = e.target.closest("[data-fix-email]");
+    if (!btn) return;
+    field("email").value = btn.dataset.fixEmail;
+    checkEmail(true);
+});
 
 
 /* =========================================================
-   MOBILE NUMBER CLEANING
+   SERIAL NUMBER
 ========================================================= */
 
-mobileInput
-    ?.addEventListener(
-        "input",
-        event => {
+const SERIAL_RE = /^[A-Z0-9][A-Z0-9/_\-.]{2,49}$/;
 
-            event.target.value =
-                event.target.value
-                    .replace(
-                        /\D/g,
-                        ""
-                    )
-                    .slice(
-                        0,
-                        10
-                    );
-
-        }
-    );
-
-
-
-/* =========================================================
-   SERIAL NUMBER CLEANING
-
-   Example:
-   se-000001 -> SE-000001
-========================================================= */
-
-serialInput
-    ?.addEventListener(
-        "input",
-        event => {
-
-            event.target.value =
-                event.target.value
-                    .trimStart()
-                    .toUpperCase();
-
-            /*
-               Remove old error as user
-               starts correcting serial.
-            */
-
-            hideWarrantyError();
-
-        }
-    );
-
-
-
-/* =========================================================
-   NORMALIZE SERIAL NUMBER
-========================================================= */
-
-function normalizeSerialNumber(
-    value
-) {
-
-    return String(
-        value || ""
-    )
-        .trim()
-        .toUpperCase();
-
+function checkSerial(final = false) {
+    const value = field("serialNumber").value.trim();
+    if (!value) {
+        setHint("serialNumber", final ? "Please enter the device serial number." : "");
+        markField("serialNumber", final);
+        return false;
+    }
+    if (!SERIAL_RE.test(value)) {
+        setHint("serialNumber", "Serial number can contain only letters, numbers and / - _ . characters.");
+        markField("serialNumber", true);
+        return false;
+    }
+    setHint("serialNumber", "");
+    markField("serialNumber", false);
+    return true;
 }
 
+field("serialNumber")?.addEventListener("input", e => {
+    const pos = e.target.selectionStart;
+    e.target.value = e.target.value.toUpperCase().replace(/\s+/g, "");
+    try { e.target.setSelectionRange(pos, pos); } catch { /* ignore */ }
+    hideError();
+    checkSerial(false);
+});
+field("serialNumber")?.addEventListener("blur", () => checkSerial(true));
 
 
 /* =========================================================
-   SERIAL NUMBER FIREBASE CHECK
-
-   Firestore Structure:
-
-   serialNumbers
-       SE-000001
-           serialNumber: "SE-000001"
-           active: true
-           registered: false
+   PURCHASE DATE — "are you sure" + 15 days notice
 ========================================================= */
 
-async function verifySerialNumber(
-    serialNumber
-) {
+if (field("purchaseDate")) field("purchaseDate").max = todayISO();
 
-    if (!db) {
-
-        throw new Error(
-            "Database connection is not available."
-        );
-
+function checkPurchaseDate(final = false) {
+    const value = field("purchaseDate").value;
+    if (!value) {
+        setHint("purchaseDate", final ? "Please select the purchase date." : "");
+        markField("purchaseDate", final);
+        return false;
     }
 
-
-    const normalizedSerial =
-        normalizeSerialNumber(
-            serialNumber
-        );
-
-
-    if (!normalizedSerial) {
-
-        return {
-
-            valid: false,
-
-            reason:
-                "empty"
-
-        };
-
+    const days = daysSince(value);
+    if (days === null) {
+        setHint("purchaseDate", "Please enter a valid purchase date.");
+        markField("purchaseDate", true);
+        return false;
+    }
+    if (days < 0) {
+        setHint("purchaseDate", "Purchase date cannot be in the future.");
+        markField("purchaseDate", true);
+        return false;
     }
 
+    markField("purchaseDate", false);
 
-
-    /*
-       Serial number is being used
-       as Firestore Document ID.
-    */
-
-    const serialRef =
-        doc(
-            db,
-            "serialNumbers",
-            normalizedSerial
-        );
-
-
-    const serialSnapshot =
-        await getDoc(
-            serialRef
-        );
-
-
-
-    /* =====================================================
-       SERIAL DOES NOT EXIST
-    ===================================================== */
-
-    if (
-        !serialSnapshot.exists()
-    ) {
-
-        return {
-
-            valid: false,
-
-            reason:
-                "not-found",
-
-            ref:
-                serialRef
-
-        };
-
+    let html = `Are you sure that your purchase date <b>${escapeHtml(prettyDate(value))}</b> is correct?`;
+    if (days > REGISTRATION_DAYS) {
+        html += `<br>⚠ This is ${days} days ago. Warranty registration must be done within ${REGISTRATION_DAYS} days of purchase, so it may not be approved.`;
     }
+    setHint("purchaseDate", html);
+    return true;
+}
+
+field("purchaseDate")?.addEventListener("change", () => checkPurchaseDate(false));
+field("purchaseDate")?.addEventListener("input", () => checkPurchaseDate(false));
 
 
+/* =========================================================
+   PHOTO — preview + compression
+========================================================= */
 
-    const serialData =
-        serialSnapshot.data();
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_ORIGINAL = 15 * 1024 * 1024;
+const preview = document.querySelector("#photoPreview");
 
+field("photo")?.addEventListener("change", () => {
+    const file = field("photo").files?.[0];
+    if (!file) { if (preview) preview.hidden = true; return; }
 
-
-    /* =====================================================
-       SERIAL INACTIVE
-    ===================================================== */
-
-    if (
-        serialData.active === false
-    ) {
-
-        return {
-
-            valid: false,
-
-            reason:
-                "inactive",
-
-            data:
-                serialData,
-
-            ref:
-                serialRef
-
-        };
-
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        showError("Please upload a JPG, PNG or WEBP photo of the installed device.");
+        field("photo").value = "";
+        if (preview) preview.hidden = true;
+        return;
     }
-
-
-
-    /* =====================================================
-       ALREADY REGISTERED
-    ===================================================== */
-
-    if (
-        serialData.registered === true
-    ) {
-
-        return {
-
-            valid: false,
-
-            reason:
-                "already-registered",
-
-            data:
-                serialData,
-
-            ref:
-                serialRef
-
-        };
-
+    hideError();
+    if (preview) {
+        preview.querySelector("img").src = URL.createObjectURL(file);
+        preview.querySelector("span").textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        preview.hidden = false;
     }
+});
 
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("This photo could not be read. Please choose another image."));
+        img.src = URL.createObjectURL(file);
+    });
+}
 
+/* Resize to max 1600px & JPEG ~82% -> usually 200–600 KB */
+async function compressPhoto(file) {
+    const img = await loadImage(file);
+    const MAX = 1600;
+    const scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale);
+    const h = Math.round(img.naturalHeight * scale);
 
-    /* =====================================================
-       VALID SERIAL
-    ===================================================== */
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+
+    let quality = 0.82;
+    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+    while (dataUrl.length > 3.8 * 1024 * 1024 && quality > 0.45) {
+        quality -= 0.12;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+    }
 
     return {
-
-        valid: true,
-
-        data:
-            serialData,
-
-        ref:
-            serialRef,
-
-        normalizedSerial
-
+        name: file.name.replace(/\.[^.]+$/, "") + ".jpg",
+        type: "image/jpeg",
+        data: dataUrl.split(",")[1]
     };
-
 }
 
 
-
 /* =========================================================
-   PHOTO VALIDATION
+   SUCCESS POPUP
 ========================================================= */
 
-function validatePhoto(
-    file
-) {
-
-    if (
-        !file ||
-        !file.size
-    ) {
-
-        throw new Error(
-            "Please upload the installed device / serial number photograph."
-        );
-
-    }
-
-
-    const allowedTypes = [
-
-        "image/jpeg",
-
-        "image/png",
-
-        "image/webp"
-
-    ];
-
-
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
-
-        throw new Error(
-            "Please upload a JPG, PNG or WEBP image."
-        );
-
-    }
-
-
-
-    /*
-       Maximum 8 MB
-    */
-
-    const maxSize =
-        8 *
-        1024 *
-        1024;
-
-
-    if (
-        file.size >
-        maxSize
-    ) {
-
-        throw new Error(
-            "Installed device photo must be below 8 MB."
-        );
-
-    }
-
-
-    return true;
-
-}
-
-
-
-/* =========================================================
-   UPLOAD WARRANTY PHOTO
-========================================================= */
-
-async function uploadWarrantyPhoto(
-    file,
-    serialNumber
-) {
-
-    const safeFileName =
-        file.name.replace(
-
-            /[^a-zA-Z0-9._-]/g,
-
-            "_"
-
-        );
-
-
-    const safeSerial =
-        serialNumber.replace(
-
-            /[^a-zA-Z0-9_-]/g,
-
-            "_"
-
-        );
-
-
-    const uniqueID =
-
-        typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID === "function"
-
-            ? crypto.randomUUID()
-
-            : `${Date.now()}-${Math.random()
-                .toString(36)
-                .slice(2)}`;
-
-
-
-    const photoPath =
-
-        `warranty/${safeSerial}/${uniqueID}-${safeFileName}`;
-
-
-
-    const storageReference =
-        ref(
-            storage,
-            photoPath
-        );
-
-
-    await uploadBytes(
-
-        storageReference,
-
-        file,
-
-        {
-
-            contentType:
-                file.type
-
-        }
-
+function openSuccess({ email, serialNumber }) {
+    if (!successModal) return;
+    successModal.querySelector("#wrEmail").textContent = email || "";
+    successModal.querySelector("#wrSerial").textContent = `Serial No: ${serialNumber}`;
+    const msg = encodeURIComponent(
+        `Hello SAFE ESCAPE, I have submitted my warranty registration.\nSerial No: ${serialNumber}\nEmail: ${email}`
     );
-
-
-    return photoPath;
-
+    successModal.querySelector("#wrWhatsapp").href = `https://wa.me/${SUPPORT.whatsapp}?text=${msg}`;
+    successModal.hidden = false;
+    document.body.style.overflow = "hidden";
 }
 
+function closeSuccess() {
+    if (!successModal) return;
+    successModal.hidden = true;
+    document.body.style.overflow = "";
+}
+
+successModal?.addEventListener("click", e => {
+    if (e.target === successModal || e.target.closest("[data-close-success]")) closeSuccess();
+});
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && successModal && !successModal.hidden) closeSuccess();
+});
 
 
 /* =========================================================
-   FORM SUBMIT
-
-   IMPORTANT:
-   We intentionally DO NOT use:
-
-   !document.querySelector('[data-sheet-form]')
-
-   because this warranty form must be handled here.
+   SUBMIT
 ========================================================= */
 
-form?.addEventListener(
-
-    "submit",
-
-    async event => {
-
-
-        event.preventDefault();
-
-
-        event.stopImmediatePropagation();
-
-
-        hideWarrantyError();
-
-
-
-        /* =================================================
-           HTML REQUIRED FIELD VALIDATION
-        ================================================= */
-
-        if (
-            !form.checkValidity()
-        ) {
-
-            form.reportValidity();
-
-            return;
-
-        }
-
-
-
-        /* =================================================
-           MOBILE NUMBER VALIDATION
-        ================================================= */
-
-        const mobile =
-            String(
-                mobileInput?.value ||
-                ""
-            ).trim();
-
-
-        if (
-            !/^[0-9]{10}$/.test(
-                mobile
-            )
-        ) {
-
-            showWarrantyError(
-                "Please enter a valid 10-digit mobile number."
-            );
-
-            mobileInput?.focus();
-
-            return;
-
-        }
-
-
-
-        /* =================================================
-           WARRANTY DATE CHECK
-        ================================================= */
-
-        if (
-            !validateWarrantyPeriod()
-        ) {
-
-            return;
-
-        }
-
-
-
-        /* =================================================
-           SERIAL NUMBER
-        ================================================= */
-
-        const serialNumber =
-            normalizeSerialNumber(
-                serialInput?.value
-            );
-
-
-        if (!serialNumber) {
-
-            showWarrantyError(
-                "Please enter the Device Serial Number."
-            );
-
-            serialInput?.focus();
-
-            return;
-
-        }
-
-
-
-        /* =================================================
-           DISABLE SUBMIT BUTTON
-        ================================================= */
-
-        if (submitButton) {
-
-            submitButton.disabled =
-                true;
-
-
-            submitButton.textContent =
-                "Verifying Serial Number…";
-
-        }
-
-
-
-        try {
-
-
-            /* =================================================
-               INITIALIZE FIREBASE
-            ================================================= */
-
-            initializeFirebase();
-
-
-
-            /* =================================================
-               SERIAL NUMBER VERIFICATION
-            ================================================= */
-
-            const serialResult =
-                await verifySerialNumber(
-                    serialNumber
-                );
-
-
-
-            /* =================================================
-               INVALID SERIAL
-            ================================================= */
-
-            if (
-                serialResult.reason ===
-                "not-found"
-            ) {
-
-                showWarrantyError(
-
-                    "Invalid Serial Number. The serial number entered does not match our database. Please check the serial number printed on your SAFE ESCAPE device and try again."
-
-                );
-
-
-                serialInput?.focus();
-
-
-                return;
-
-            }
-
-
-
-            /* =================================================
-               INACTIVE SERIAL
-            ================================================= */
-
-            if (
-                serialResult.reason ===
-                "inactive"
-            ) {
-
-                showWarrantyError(
-
-                    "This Serial Number is currently inactive and cannot be registered. Please contact SAFE ESCAPE support."
-
-                );
-
-
-                serialInput?.focus();
-
-
-                return;
-
-            }
-
-
-
-            /* =================================================
-               ALREADY REGISTERED
-            ================================================= */
-
-            if (
-                serialResult.reason ===
-                "already-registered"
-            ) {
-
-                showWarrantyError(
-
-                    "This Serial Number has already been registered for warranty. Duplicate warranty registration is not permitted."
-
-                );
-
-
-                serialInput?.focus();
-
-
-                return;
-
-            }
-
-
-
-            if (
-                !serialResult.valid
-            ) {
-
-                showWarrantyError(
-
-                    "Unable to verify this Serial Number. Please check the number and try again."
-
-                );
-
-
-                return;
-
-            }
-
-
-
-            /* =================================================
-               SERIAL VERIFIED
-            ================================================= */
-
-            if (submitButton) {
-
-                submitButton.textContent =
-                    "Uploading Photo…";
-
-            }
-
-
-
-            /* =================================================
-               FORM DATA
-            ================================================= */
-
-            const fd =
-                new FormData(
-                    form
-                );
-
-
-            const file =
-                fd.get(
-                    "photo"
-                );
-
-
-
-            /* =================================================
-               PHOTO VALIDATION
-            ================================================= */
-
-            validatePhoto(
-                file
-            );
-
-
-
-            /* =================================================
-               RECHECK INSTALLATION DATE
-            ================================================= */
-
-            const installationDateValue =
-                String(
-                    fd.get(
-                        "installationDate"
-                    ) || ""
-                );
-
-
-            const daysSinceInstallation =
-                getDaysSinceInstallation(
-                    installationDateValue
-                );
-
-
-            if (
-                daysSinceInstallation === null
-            ) {
-
-                throw new Error(
-                    "Please enter a valid installation date."
-                );
-
-            }
-
-
-            if (
-                daysSinceInstallation < 0
-            ) {
-
-                showWarrantyError(
-
-                    "The installation date cannot be in the future."
-
-                );
-
-
-                return;
-
-            }
-
-
-            if (
-                daysSinceInstallation >= 16
-            ) {
-
-                showWarrantyError(
-
-                    "Warranty registration period has expired. Registration must be completed within 15 calendar days of installation."
-
-                );
-
-
-                return;
-
-            }
-
-
-
-            /* =================================================
-               UPLOAD PHOTO
-            ================================================= */
-
-            const photoPath =
-                await uploadWarrantyPhoto(
-
-                    file,
-
-                    serialNumber
-
-                );
-
-
-
-            /* =================================================
-               PREPARE DATABASE OBJECT
-            ================================================= */
-
-            const data = {};
-
-
-            for (
-                const [key, value]
-                of fd.entries()
-            ) {
-
-                /*
-                   Do not save File object
-                   directly to Firestore.
-                */
-
-                if (
-                    key === "photo"
-                ) {
-
-                    continue;
-
-                }
-
-
-                data[key] =
-                    typeof value === "string"
-
-                        ? value.trim()
-
-                        : value;
-
-            }
-
-
-
-            /*
-               Always save normalized serial.
-            */
-
-            data.serialNumber =
-                serialNumber;
-
-
-            data.mobile =
-                mobile;
-
-
-
-            /* =================================================
-               CHANGE BUTTON
-            ================================================= */
-
-            if (submitButton) {
-
-                submitButton.textContent =
-                    "Saving Registration…";
-
-            }
-
-
-
-            /* =================================================
-               SAVE WARRANTY REGISTRATION
-            ================================================= */
-
-            const registrationReference =
-                await addDoc(
-
-                    collection(
-                        db,
-                        "warrantyRegistrations"
-                    ),
-
-                    {
-
-                        ...data,
-
-
-                        /* PHOTO */
-
-                        photoPath,
-
-
-                        /* SERIAL VERIFICATION */
-
-                        serialVerified:
-                            true,
-
-
-                        serialDatabaseDocument:
-                            serialResult.ref.id,
-
-
-                        /* WARRANTY */
-
-                        registrationEligibility:
-                            "within-15-days",
-
-
-                        daysSinceInstallation,
-
-
-                        warrantyYears:
-                            5,
-
-
-                        /* STATUS */
-
-                        status:
-                            "pending-review",
-
-
-                        /* TIMESTAMP */
-
-                        createdAt:
-                            serverTimestamp()
-
-                    }
-
-                );
-
-
-
-            /* =================================================
-               MARK SERIAL NUMBER AS REGISTERED
-            ================================================= */
-
-            await updateDoc(
-
-                serialResult.ref,
-
-                {
-
-                    registered:
-                        true,
-
-
-                    registeredAt:
-                        serverTimestamp(),
-
-
-                    warrantyRegistrationId:
-                        registrationReference.id,
-
-
-                    warrantyStatus:
-                        "pending-review"
-
-                }
-
-            );
-
-
-
-            /* =================================================
-               SUCCESS
-            ================================================= */
-
-            form.reset();
-
-
-            hideWarrantyError();
-
-
-            showMessage(
-
-                "Warranty registration submitted successfully. Your Serial Number has been verified and the registration is now pending review.",
-
-                "success"
-
-            );
-
-
-
-            /*
-               Scroll to form top
-            */
-
-            form.scrollIntoView({
-
-                behavior:
-                    "smooth",
-
-                block:
-                    "start"
-
-            });
-
-
-        }
-
-
-        catch (error) {
-
-
-            console.error(
-                "SAFE ESCAPE Warranty Error:",
-                error
-            );
-
-
-
-            /* =================================================
-               FIRESTORE PERMISSION ERROR
-            ================================================= */
-
-            if (
-                error?.code ===
-                "permission-denied"
-            ) {
-
-                showWarrantyError(
-
-                    "Database permission denied. Please check your Firebase Firestore and Storage security rules."
-
-                );
-
-            }
-
-
-
-            /* =================================================
-               NETWORK ERROR
-            ================================================= */
-
-            else if (
-                error?.code ===
-                "unavailable"
-            ) {
-
-                showWarrantyError(
-
-                    "Unable to connect to the server. Please check your internet connection and try again."
-
-                );
-
-            }
-
-
-
-            /* =================================================
-               STORAGE ERROR
-            ================================================= */
-
-            else if (
-                String(
-                    error?.code || ""
-                ).startsWith(
-                    "storage/"
-                )
-            ) {
-
-                showWarrantyError(
-
-                    "The installation photo could not be uploaded. Please try again."
-
-                );
-
-            }
-
-
-
-            /* =================================================
-               OTHER ERROR
-            ================================================= */
-
-            else {
-
-                showWarrantyError(
-
-                    error?.message ||
-
-                    "Could not submit the warranty registration. Please try again."
-
-                );
-
-            }
-
-
-            showMessage(
-
-                "Warranty registration could not be submitted.",
-
-                "error"
-
-            );
-
-
-        }
-
-
-        finally {
-
-
-            /* =================================================
-               RESTORE BUTTON
-            ================================================= */
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    false;
-
-
-                submitButton.textContent =
-                    "Submit Registration →";
-
-            }
-
-
-        }
-
-
-    },
-
-    /*
-       Capture mode helps this warranty handler
-       take control before generic form handlers.
-    */
-
-    true
-
-);
-
-
-
-/* =========================================================
-   RESET BUTTON
-========================================================= */
-
-form?.addEventListener(
-
-    "reset",
-
-    () => {
-
-
-        hideWarrantyError();
-
-
-        setTimeout(
-            () => {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-
-                    submitButton.textContent =
-                        "Submit Registration →";
-
-                }
-
-            },
-            0
-        );
-
-
+function setBusy(text) {
+    if (!submitButton) return;
+    submitButton.disabled = Boolean(text);
+    submitButton.textContent = text || SUBMIT_LABEL;
+}
+
+function firstMissingRequired() {
+    const required = [
+        ["customerName", "Please enter the customer / company name."],
+        ["wireLength", "Please select the length of wire."],
+        ["purchasedFrom", "Please enter where you purchased the device from."],
+        ["installationAddress", "Please enter the installation address including floor."],
+        ["installedBy", "Please enter who installed the device."]
+    ];
+    for (const [name, message] of required) {
+        if (!String(field(name)?.value || "").trim()) return { name, message };
+    }
+    return null;
+}
+
+form?.addEventListener("submit", async event => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    hideError();
+
+    /* ---- client checks (server checks again) ---- */
+    const missing = firstMissingRequired();
+    if (missing) { markField(missing.name, true); field(missing.name).focus(); showError(missing.message); return; }
+
+    if (!checkMobile(true)) { field("mobile").focus(); showError("Please enter a valid 10-digit mobile number."); return; }
+    if (!checkEmail(true)) { field("email").focus(); showError("Please enter a valid email address."); return; }
+    if (!checkSerial(true)) { field("serialNumber").focus(); showError("Please enter a valid device serial number."); return; }
+    if (!checkPurchaseDate(true)) { field("purchaseDate").focus(); showError("Please enter a valid purchase date."); return; }
+
+    const file = field("photo")?.files?.[0];
+    if (!file) { showError("Please upload a clear photo of the installed SAFE ESCAPE device."); return; }
+    if (!ALLOWED_TYPES.includes(file.type)) { showError("Please upload a JPG, PNG or WEBP image."); return; }
+    if (file.size > MAX_ORIGINAL) { showError("Photo is too large (max 15 MB). Please choose a smaller photo."); return; }
+
+    if (!field("termsAccepted")?.checked) {
+        showError("Please tick the box to accept the Warranty Activation Terms and Conditions.");
+        return;
     }
 
-);
+    try {
+        setBusy("Preparing photo…");
+        const photo = await compressPhoto(file);
 
+        setBusy("Verifying & submitting…");
+
+        const payload = {
+            customerName: field("customerName").value.trim(),
+            mobile: field("mobile").value.trim(),
+            email: field("email").value.trim().toLowerCase(),
+            serialNumber: field("serialNumber").value.trim().toUpperCase(),
+            wireLength: field("wireLength").value,
+            purchasedFrom: field("purchasedFrom").value.trim(),
+            installationAddress: field("installationAddress").value.trim(),
+            purchaseDate: field("purchaseDate").value,
+            installedBy: field("installedBy").value.trim(),
+            termsAccepted: true,
+            photo
+        };
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 30000);
+
+        let res, data = {};
+        try {
+            res = await fetch(`${functionsBaseUrl || "/.netlify/functions"}/warranty-submit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            data = await res.json().catch(() => ({}));
+        } finally {
+            clearTimeout(timer);
+        }
+
+        if (!res.ok || !data.success) {
+            if (data.field) {
+                markField(data.field, true);
+                field(data.field)?.focus?.();
+            }
+            const title = data.field === "serialNumber" ? "Serial number problem" : "Could not submit registration";
+            showError(data.message || "Could not submit the warranty registration. Please try again.", title);
+            return;
+        }
+
+        /* ---- success ---- */
+        form.reset();
+        ["mobile", "email", "serialNumber", "purchaseDate"].forEach(n => { setHint(n, ""); markField(n, false); });
+        if (preview) preview.hidden = true;
+        openSuccess({ email: data.email || payload.email, serialNumber: data.serialNumber || payload.serialNumber });
+
+    } catch (error) {
+        console.error("SAFE ESCAPE Warranty Error:", error);
+        showError(
+            error.name === "AbortError"
+                ? "The server is taking too long. Please check your internet connection and try again."
+                : (error.message || "Could not submit the warranty registration. Please try again."),
+            "Could not submit registration"
+        );
+    } finally {
+        setBusy("");
+    }
+}, true);
 
 
 /* =========================================================
-   INITIAL LOG
+   RESET
 ========================================================= */
 
-console.log(
-    "SAFE ESCAPE Warranty Registration JS Loaded."
-);
+form?.addEventListener("reset", () => {
+    hideError();
+    setTimeout(() => {
+        ["mobile", "email", "serialNumber", "purchaseDate"].forEach(n => { setHint(n, ""); markField(n, false); });
+        form.querySelectorAll(".has-error").forEach(el => el.classList.remove("has-error"));
+        if (preview) preview.hidden = true;
+        setBusy("");
+    }, 0);
+});
+
+/* clear red border as user types */
+form?.addEventListener("input", e => {
+    const name = e.target?.name;
+    if (name && !["mobile", "email", "serialNumber", "purchaseDate"].includes(name)) markField(name, false);
+});

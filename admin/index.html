@@ -307,7 +307,22 @@
             <h2 id="recordsTitle">Recent Orders</h2>
             <p id="recordsDescription">All records from your Firebase database.</p>
           </div>
-          <span class="record-count" id="recordCount">LIVE DATA</span>
+          <div class="records-right">
+            <div class="warranty-summary" id="warrantySummary" hidden></div>
+            <span class="record-count" id="recordCount">LIVE DATA</span>
+          </div>
+        </div>
+
+        <div class="warranty-tools" id="warrantyTools" hidden>
+          <div>
+            <b>Serial Numbers</b>
+            <small id="serialInfo">Upload the serial numbers of your devices so customers can register warranty.</small>
+          </div>
+          <div class="warranty-tool-buttons">
+            <button type="button" class="btn btn-light" id="sampleCsvBtn">⬇ Sample CSV</button>
+            <button type="button" class="btn btn-light" id="serialListBtn">☰ View Serials</button>
+            <button type="button" class="btn btn-primary" id="bulkUploadBtn">⬆ Bulk Upload Serials</button>
+          </div>
         </div>
 
         <div class="table-toolbar">
@@ -316,6 +331,13 @@
             <input type="search" id="tableSearch" placeholder="Search name, mobile, email, order no…">
           </div>
           <select id="statusFilter" class="toolbar-select" hidden></select>
+        </div>
+
+        <div class="table-toolbar warranty-filters" id="warrantyFilters" hidden>
+          <label class="mini-field"><span>Purchase from</span><input type="date" id="wfFrom"></label>
+          <label class="mini-field"><span>Purchase to</span><input type="date" id="wfTo"></label>
+          <label class="mini-field"><span>Wire length</span><select id="wfLength"><option value="">All wire lengths</option></select></label>
+          <button type="button" class="btn btn-light" id="wfClear">✕ Clear filters</button>
         </div>
 
         <div id="dataOut">

@@ -354,12 +354,14 @@ async function countOf(collectionName, category = null) {
 }
 
 async function refreshCounts() {
-  const [orders, enquiries, warranty, coupons] = await Promise.all([
+  const [orders, enquiries, coupons] = await Promise.all([
     countOf("orders"),
     countOf("formSubmissions", "enquiry"),
-    countOf("formSubmissions", "warranty"),
     countOf("coupons")
   ]);
+
+  // Warranty counts come from the secure warranty API
+  fetchRecords("warranty").then(updateWarrantyCounts).catch(() => { $("#navWarranty").textContent = ""; });
 
   $("#orderCount").textContent = orders;
   $("#enquiryCount").textContent = enquiries;
@@ -367,7 +369,6 @@ async function refreshCounts() {
 
   $("#navOrders").textContent = orders || "";
   $("#navEnquiries").textContent = enquiries || "";
-  $("#navWarranty").textContent = warranty || "";
   $("#navCoupons").textContent = coupons || "";
 
   // Revenue needs order data
@@ -396,6 +397,14 @@ async function refreshCounts() {
 async function fetchRecords(tab, force = false) {
   if (!force && state.cache[tab]) return state.cache[tab];
 
+  if (tab === "warranty") {
+    const data = await warrantyApi("list");
+    state.warrantyMeta = { counts: data.counts, serials: data.serials };
+    const rows = data.rows || [];
+    state.cache.warranty = rows;
+    return rows;
+  }
+
   let snapshot;
 
   if (tab === "orders") {
@@ -405,7 +414,7 @@ async function fetchRecords(tab, force = false) {
   } else {
     snapshot = await getDocs(query(
       collection(db, "formSubmissions"),
-      where("category", "==", tab === "warranty" ? "warranty" : "enquiry"),
+      where("category", "==", "enquiry"),
       limit(500)
     ));
   }
@@ -424,6 +433,10 @@ function searchText(tab, row) {
     return [row.orderNumber, row.id, c.fullName, c.mobile, c.email, c.city, row.cart?.couponCode, row.razorpayPaymentId].join(" ");
   }
   if (tab === "coupons") return [row.id, row.title].join(" ");
+  if (tab === "warranty") {
+    return [row.serialNumber, row.customerName, row.mobile, row.email, row.purchasedFrom, row.installedBy,
+      row.installationAddress, row.wireLength ? row.wireLength + "m" : "", row.status, row.registrationId].join(" ");
+  }
   const d = row.details || {};
   return [row.formType, row.subject, ...Object.values(d)].join(" ");
 }
@@ -434,6 +447,9 @@ function setupStatusFilter(tab) {
     options = [["all", "All statuses"], ...ORDER_STATUSES.map(s => [s, s.replaceAll("_", " ")])];
   } else if (tab === "coupons") {
     options = [["all", "All coupons"], ["active", "Active"], ["paused", "Paused"]];
+  } else if (tab === "warranty") {
+    options = [["all", "All statuses"], ["pending", "Pending approval"], ["approved", "Approved"],
+      ["rejected", "Rejected"], ["late", "Late (> 15 days)"]];
   } else {
     const types = [...new Set(state.records.map(r => r.formType).filter(Boolean))];
     options = types.length > 1 ? [["all", "All form types"], ...types.map(t => [t, t])] : [];
@@ -443,6 +459,21 @@ function setupStatusFilter(tab) {
   statusFilter.innerHTML = options.map(([v, l]) => `<option value="${escapeHtml(v)}">${escapeHtml(l)}</option>`).join("");
   statusFilter.value = "all";
   state.status = "all";
+
+  // extra warranty filters
+  const extra = $("#warrantyFilters");
+  if (extra) {
+    extra.hidden = tab !== "warranty";
+    if (tab === "warranty") {
+      const lengths = [...new Set(state.records.map(r => String(r.wireLength || "")).filter(Boolean))]
+        .sort((a, b) => Number(a) - Number(b));
+      $("#wfLength").innerHTML = `<option value="">All wire lengths</option>` +
+        lengths.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)} m</option>`).join("");
+      $("#wfFrom").value = ""; $("#wfTo").value = ""; $("#wfLength").value = "";
+    }
+  }
+  $("#warrantyTools") && ($("#warrantyTools").hidden = tab !== "warranty");
+  $("#warrantySummary") && ($("#warrantySummary").hidden = tab !== "warranty");
 }
 
 function applyFilters() {
@@ -451,11 +482,21 @@ function applyFilters() {
 
   state.filtered = state.records.filter(row => {
     if (term && !searchText(tab, row).toLowerCase().includes(term)) return false;
+    if (tab === "warranty" && !warrantyExtraMatch(row)) return false;
     if (state.status === "all") return true;
+    if (tab === "warranty") return state.status === "late" ? row.lateRegistration === true : row.status === state.status;
     if (tab === "orders") return row.status === state.status;
     if (tab === "coupons") return state.status === "active" ? row.active === true : row.active !== true;
     return row.formType === state.status;
   });
+
+  if (tab === "warranty") {
+    // Pending approvals always on top, newest first
+    const rank = { pending: 0, approved: 1, rejected: 2 };
+    state.filtered.sort((a, b) =>
+      (rank[a.status] ?? 3) - (rank[b.status] ?? 3) ||
+      String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+  }
 
   const pages = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
   if (state.page > pages) state.page = pages;
@@ -490,12 +531,13 @@ async function loadData(tab, force = false) {
 function render() {
   const total = state.filtered.length;
   $("#recordCount").textContent = `${state.records.length} RECORD${state.records.length === 1 ? "" : "S"}`;
+  if (state.tab === "warranty") updateWarrantyCounts(state.records);
 
   if (!total) {
     output.innerHTML = `
       <div class="admin-empty">
         <div class="empty-icon">⌕</div>
-        <b>${state.records.length ? "No matching records" : "No records yet"}</b>
+        <b>${state.records.length ? "No matching records" : (state.tab === "warranty" ? "No warranty registrations yet" : "No records yet")}</b>
         <p>${state.records.length ? "Try a different search or filter." : "New data will appear here automatically."}</p>
       </div>`;
     paginationBox.hidden = true;
@@ -507,6 +549,7 @@ function render() {
 
   if (state.tab === "orders") renderOrders(rows);
   else if (state.tab === "coupons") renderCoupons(rows);
+  else if (state.tab === "warranty") renderWarranty(rows);
   else renderForms(rows);
 
   renderPagination(total, start, rows.length);
@@ -1250,3 +1293,621 @@ document.querySelectorAll("[data-admin-tab]").forEach(button => {
 
 $("#menuToggle")?.addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
 $("#sidebarBackdrop")?.addEventListener("click", closeSidebar);
+
+
+
+/* =========================================================
+   WARRANTY REGISTRATIONS
+========================================================= */
+
+const REJECT_REASONS = [
+  "Warranty registration was submitted after 15 days of purchase.",
+  "The details filled in the form are incorrect or do not match our records.",
+  "The uploaded photo is not clear / does not show the installed SAFE ESCAPE device.",
+  "The serial number details do not match the product supplied.",
+  "Product was not purchased from an authorised SAFE ESCAPE seller."
+];
+
+async function warrantyApi(action, body = {}) {
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(`${functionsBaseUrl || "/.netlify/functions"}/warranty-admin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ action, ...body })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) throw new Error(data.message || `Request failed (${res.status})`);
+  return data;
+}
+
+function prettyDay(value) {
+  const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return value ? formatDate(value) : "—";
+  return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function updateWarrantyCounts(rows = []) {
+  const c = { pending: 0, approved: 0, rejected: 0 };
+  rows.forEach(r => { if (c[r.status] !== undefined) c[r.status] += 1; });
+
+  const nav = $("#navWarranty");
+  if (nav) {
+    nav.textContent = c.pending ? c.pending : (rows.length || "");
+    nav.classList.toggle("nav-count-alert", c.pending > 0);
+    nav.title = c.pending ? `${c.pending} pending approval` : "";
+  }
+
+  const box = $("#warrantySummary");
+  if (box) {
+    box.innerHTML = `
+      <span class="sum-chip pending" data-sum="pending">⏳ <b>${c.pending}</b> Pending approval</span>
+      <span class="sum-chip approved" data-sum="approved">✓ <b>${c.approved}</b> Approved</span>
+      <span class="sum-chip rejected" data-sum="rejected">✕ <b>${c.rejected}</b> Rejected</span>`;
+  }
+
+  const serials = state.warrantyMeta?.serials;
+  const sInfo = $("#serialInfo");
+  if (sInfo && serials) {
+    sInfo.textContent = `${serials.total} serials uploaded · ${serials.registered} registered`;
+  }
+}
+
+function warrantyExtraMatch(row) {
+  const from = $("#wfFrom")?.value;
+  const to = $("#wfTo")?.value;
+  const len = $("#wfLength")?.value;
+  const day = String(row.purchaseDate || "").slice(0, 10);
+  if (from && (!day || day < from)) return false;
+  if (to && (!day || day > to)) return false;
+  if (len && String(row.wireLength || "") !== len) return false;
+  return true;
+}
+
+["#wfFrom", "#wfTo", "#wfLength"].forEach(sel => {
+  $(sel)?.addEventListener("change", () => { state.page = 1; applyFilters(); });
+});
+$("#wfClear")?.addEventListener("click", () => {
+  $("#wfFrom").value = ""; $("#wfTo").value = ""; $("#wfLength").value = "";
+  statusFilter.value = "all"; state.status = "all";
+  searchInput.value = ""; state.search = "";
+  state.page = 1; applyFilters();
+});
+
+$("#warrantySummary")?.addEventListener("click", e => {
+  const chip = e.target.closest("[data-sum]");
+  if (!chip) return;
+  statusFilter.value = chip.dataset.sum;
+  state.status = chip.dataset.sum;
+  state.page = 1;
+  applyFilters();
+});
+
+function photoButton(row, cls = "row-btn image") {
+  const label = cls.startsWith("row-btn") ? "🖼 Image" : "🖼 View Image";
+  if (row.photoUrl) {
+    return `<a class="${cls}" href="${escapeHtml(row.photoUrl)}" target="_blank" rel="noopener" title="Open photo in new tab">${label}</a>`;
+  }
+  if (row.photoPath && !row.photoUrl) {
+    return `<span class="${cls} disabled" title="Old record — photo is in Firebase Storage: ${escapeHtml(row.photoPath)}">🖼 In Storage</span>`;
+  }
+  return `<button type="button" class="${cls}" data-find-photo="${escapeHtml(row.id)}" title="Find photo in Google Drive">${label}</button>`;
+}
+
+function renderWarranty(rows) {
+  output.innerHTML = `
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Serial No.</th>
+            <th>Customer</th>
+            <th>Wire</th>
+            <th>Purchase Date</th>
+            <th>Purchased From</th>
+            <th>Status</th>
+            <th class="th-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row => `
+            <tr class="${row.status === "pending" ? "row-pending" : ""}">
+              <td>
+                <b class="cell-main mono serial">${escapeHtml(row.serialNumber || "—")}</b>
+                <small class="cell-sub">Submitted ${toDate(row.createdAt)?.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) || "—"}</small>
+              </td>
+              <td class="cust">
+                <b class="cell-main">${escapeHtml(row.customerName || "—")}</b>
+                <small class="cell-sub">${escapeHtml(row.mobile || "")}${row.email ? " · " + escapeHtml(row.email) : ""}</small>
+              </td>
+              <td>${row.wireLength ? escapeHtml(row.wireLength) + " m" : "—"}</td>
+              <td class="nowrap">
+                <b class="cell-main" style="font-weight:600">${prettyDay(row.purchaseDate)}</b>
+                ${row.lateRegistration ? `<small class="late-badge" title="Registered ${row.daysSincePurchase} days after purchase">LATE · ${escapeHtml(row.daysSincePurchase)}d</small>`
+                  : (row.daysSincePurchase != null ? `<small class="cell-sub">submitted after ${escapeHtml(row.daysSincePurchase)} day${row.daysSincePurchase == 1 ? "" : "s"}</small>` : "")}
+              </td>
+              <td class="from">${escapeHtml(row.purchasedFrom || "—")}</td>
+              <td>
+                ${statusTag(row.status)}
+                ${row.status === "approved" && row.warrantyEnd ? `<small class="cell-sub">till ${prettyDay(row.warrantyEnd)}</small>` : ""}
+              </td>
+              <td class="td-actions">
+                ${photoButton(row)}
+                <button type="button" class="row-btn view" data-view-warranty="${escapeHtml(row.id)}">👁 View</button>
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+
+  output.querySelectorAll("[data-view-warranty]").forEach(btn =>
+    btn.addEventListener("click", () => openWarranty(btn.dataset.viewWarranty)));
+}
+
+/* "View Image" when the Drive link is not saved yet */
+document.addEventListener("click", async e => {
+  const btn = e.target.closest("[data-find-photo]");
+  if (!btn) return;
+  e.preventDefault();
+  const win = window.open("", "_blank"); // open now so pop-up blockers allow it
+  setButtonLoading(btn, true, "Finding…");
+  try {
+    const data = await warrantyApi("photo", { id: btn.dataset.findPhoto });
+    const rec = state.records.find(r => r.id === btn.dataset.findPhoto);
+    if (rec) Object.assign(rec, { photoUrl: data.photoUrl, photoFileId: data.photoFileId });
+    if (win) win.location.href = data.photoUrl; else window.open(data.photoUrl, "_blank");
+    render();
+  } catch (error) {
+    win?.close();
+    showToast(error.message || "Photo not found.", "error");
+    setButtonLoading(btn, false);
+  }
+});
+
+function warrantyPeriodPreview(purchaseDate) {
+  const m = String(purchaseDate || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const start = new Date(+m[1], +m[2] - 1, +m[3]);
+  const end = new Date(+m[1] + 5, +m[2] - 1, +m[3] - 1);
+  const f = d => d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  return { start: f(start), end: f(end) };
+}
+
+function openWarranty(id) {
+  const r = state.records.find(x => x.id === id);
+  if (!r) return;
+
+  const period = warrantyPeriodPreview(r.purchaseDate);
+  const thumb = r.photoFileId ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(r.photoFileId)}&sz=w900` : "";
+  const mobileDigits = String(r.mobile || "").replace(/\D/g, "").slice(-10);
+
+  const decision = r.status === "approved"
+    ? `<div class="decision-banner approved">✓ Warranty approved: <b>${prettyDay(r.warrantyStart)}</b> to <b>${prettyDay(r.warrantyEnd)}</b>
+         ${r.reviewedBy ? `<small>by ${escapeHtml(r.reviewedBy)} · ${formatDate(r.reviewedAt)}</small>` : ""}</div>`
+    : r.status === "rejected"
+      ? `<div class="decision-banner rejected">✕ Rejected: ${escapeHtml(r.rejectReason || "—")}
+           ${r.reviewedBy ? `<small>by ${escapeHtml(r.reviewedBy)} · ${formatDate(r.reviewedAt)}</small>` : ""}</div>`
+      : `<div class="decision-banner pending">⏳ Waiting for approval${r.lateRegistration ? ` — <b>submitted ${escapeHtml(r.daysSincePurchase)} days after purchase (more than 15 days)</b>` : ""}</div>`;
+
+  const html = `
+    ${decision}
+
+    <div class="warranty-detail">
+      <div class="detail-grid">
+        <section class="detail-card">
+          <h4>Customer</h4>
+          ${infoRow("Name / Company", r.customerName)}
+          ${infoRow("Mobile", r.mobile)}
+          ${infoRow("Email", r.email)}
+        </section>
+
+        <section class="detail-card">
+          <h4>Product</h4>
+          ${infoRow("Serial number", r.serialNumber, true)}
+          ${infoRow("Wire length", r.wireLength ? r.wireLength + " metres" : "")}
+          ${infoRow("Purchased from", r.purchasedFrom)}
+          ${infoRow("Purchase date", prettyDay(r.purchaseDate))}
+          ${infoRow("Days (purchase → submit)", r.daysSincePurchase != null ? String(r.daysSincePurchase) : "")}
+        </section>
+
+        <section class="detail-card">
+          <h4>Installation</h4>
+          ${infoRow("Installed by", r.installedBy)}
+          ${infoRow("Installation address", r.installationAddress)}
+        </section>
+
+        <section class="detail-card">
+          <h4>Record</h4>
+          ${infoRow("Submitted", formatDate(r.createdAt))}
+          ${infoRow("Registration ID", r.id, true)}
+          <div class="info-row"><span>Photo</span>${automationBadge(r.photoStatus === "saved" ? "done" : r.photoStatus)}</div>
+          <div class="info-row"><span>Received email</span>${automationBadge(r.emailStatus)}</div>
+          ${r.decisionEmailStatus ? `<div class="info-row"><span>Decision email</span>${automationBadge(r.decisionEmailStatus)}</div>` : ""}
+          ${r.decisionEmailError ? `<p class="auto-error">${escapeHtml(r.decisionEmailError)}</p>` : ""}
+        </section>
+      </div>
+
+      <section class="detail-card photo-card">
+        <h4>Installed Device Photo</h4>
+        ${thumb ? `<a href="${escapeHtml(r.photoUrl)}" target="_blank" rel="noopener"><img src="${thumb}" alt="Installed device photo" loading="lazy"
+             onerror="this.parentElement.outerHTML='<p class=&quot;muted&quot;>Preview not available — use View Image.</p>'"></a>` : `<p class="muted">Preview not available.</p>`}
+        <div>${photoButton(r, "btn btn-light")}</div>
+      </section>
+    </div>
+
+    <div class="decision-box">
+      ${r.status !== "approved" ? `
+        <div class="decision-col">
+          <h4>Approve warranty</h4>
+          <p>${period ? `5-year warranty will be valid from <b>${period.start}</b> to <b>${period.end}</b>.` : "Purchase date missing."}
+             Customer will receive an approval email.</p>
+          <button type="button" class="btn btn-success" id="approveWarranty">✓ APPROVE WARRANTY</button>
+        </div>` : ""}
+      ${r.status !== "rejected" ? `
+        <div class="decision-col">
+          <h4>${r.status === "approved" ? "Revoke / reject warranty" : "Reject warranty"}</h4>
+          <div class="field">
+            <label>Reason (sent to customer)</label>
+            <select id="rejectReason">
+              ${REJECT_REASONS.map(x => `<option>${escapeHtml(x)}</option>`).join("")}
+              <option value="__other">Other reason (write below)…</option>
+            </select>
+          </div>
+          <div class="field" id="rejectOtherWrap" hidden>
+            <textarea id="rejectOther" rows="2" maxlength="400" placeholder="Write the reason customer will see"></textarea>
+          </div>
+          <button type="button" class="btn btn-danger" id="rejectWarranty">✕ REJECT</button>
+        </div>` : ""}
+    </div>
+
+    <div class="modal-actions">
+      ${mobileDigits ? `<a class="btn btn-light" href="tel:${escapeHtml(mobileDigits)}">📞 Call</a>
+        <a class="btn btn-light" target="_blank" rel="noopener" href="https://wa.me/91${escapeHtml(mobileDigits)}">💬 WhatsApp</a>` : ""}
+      ${r.email ? `<a class="btn btn-light" href="mailto:${escapeHtml(r.email)}">✉ Email</a>` : ""}
+    </div>`;
+
+  openModal("WARRANTY REGISTRATION", r.serialNumber || "Warranty", html);
+
+  $("#rejectReason")?.addEventListener("change", e => {
+    $("#rejectOtherWrap").hidden = e.target.value !== "__other";
+  });
+
+  $("#approveWarranty")?.addEventListener("click", async e => {
+    const ok = await confirmDialog({
+      title: "Approve this warranty?",
+      text: `${r.customerName} · ${r.serialNumber}. An approval email${period ? ` (valid ${period.start} – ${period.end})` : ""} will be sent to ${r.email}.`,
+      okText: "Yes, approve",
+      danger: false
+    });
+    if (ok) decideWarranty(r.id, "approve", "", e.currentTarget);
+  });
+
+  $("#rejectWarranty")?.addEventListener("click", async e => {
+    const sel = $("#rejectReason").value;
+    const reason = sel === "__other" ? $("#rejectOther").value.trim() : sel;
+    if (!reason) { showToast("Please write the rejection reason.", "error"); $("#rejectOther").focus(); return; }
+    const ok = await confirmDialog({
+      title: "Reject this warranty?",
+      text: `A rejection email will be sent to ${r.email} with the reason: "${reason}". The serial number will be free for the customer to register again.`,
+      okText: "Yes, reject"
+    });
+    if (ok) decideWarranty(r.id, "reject", reason, e.currentTarget);
+  });
+}
+
+async function decideWarranty(id, action, reason, button) {
+  setButtonLoading(button, true, action === "approve" ? "APPROVING…" : "REJECTING…");
+  try {
+    const data = await warrantyApi(action, { id, reason });
+    const idx = state.records.findIndex(x => x.id === id);
+    if (idx >= 0) state.records[idx] = { ...state.records[idx], ...data.record };
+    state.cache.warranty = state.records;
+    const mail = data.record.decisionEmailStatus;
+    showToast(
+      `Warranty ${action === "approve" ? "approved" : "rejected"}. ` +
+      (mail === "sent" || mail === "done" ? "Email sent to customer." : mail === "not_configured" ? "Email not configured yet." : "Email status: " + (mail || "pending")),
+      "success");
+    applyFilters();
+    openWarranty(id);
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Could not update warranty.", "error");
+    setButtonLoading(button, false);
+  }
+}
+
+
+/* =========================================================
+   BULK SERIAL UPLOAD
+========================================================= */
+
+const SAMPLE_CSV =
+  "serialNumber,wireLength,batch\n" +
+  "SAFE/ESCAPE/IIZG/006,15,IIZG\n" +
+  "SAFE/ESCAPE/IIZG/007,15,IIZG\n" +
+  "SAFE/ESCAPE/IIZG/008,20,IIZG\n";
+
+function downloadSample() {
+  const blob = new Blob([SAMPLE_CSV], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "safe-escape-serial-numbers-sample.csv";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+function splitCsvLine(line) {
+  const out = []; let cur = ""; let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { if (q && line[i + 1] === '"') { cur += '"'; i++; } else q = !q; }
+    else if (!q && (ch === "," || ch === ";" || ch === "\t")) { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out.map(x => x.trim());
+}
+
+function rowsFromTable(table) {
+  const rows = table.filter(r => r.some(c => String(c ?? "").trim()));
+  if (!rows.length) return [];
+  let start = 0;
+  let cols = { serial: 0, length: 1, batch: 2 };
+  const head = rows[0].map(c => String(c ?? "").toLowerCase().replace(/[^a-z]/g, ""));
+  if (head.some(h => h.includes("serial"))) {
+    start = 1;
+    cols = {
+      serial: head.findIndex(h => h.includes("serial")),
+      length: head.findIndex(h => h.includes("length") || h.includes("wire") || h.includes("metre") || h.includes("meter")),
+      batch: head.findIndex(h => h.includes("batch") || h.includes("lot"))
+    };
+  }
+  return rows.slice(start).map(r => ({
+    serialNumber: String(r[cols.serial] ?? "").trim().toUpperCase().replace(/\s+/g, ""),
+    wireLength: cols.length >= 0 ? String(r[cols.length] ?? "").replace(/[^0-9.]/g, "") : "",
+    batch: cols.batch >= 0 ? String(r[cols.batch] ?? "").trim() : ""
+  })).filter(r => r.serialNumber);
+}
+
+async function parseSerialFile(file) {
+  if (/\.(xlsx|xls)$/i.test(file.name)) {
+    const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    return rowsFromTable(XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false }));
+  }
+  const text = await file.text();
+  return rowsFromTable(text.replace(/^﻿/, "").split(/\r?\n/).map(splitCsvLine));
+}
+
+function openBulkUpload() {
+  let parsed = [];
+
+  openModal("SERIAL NUMBERS", "Bulk Upload Serial Numbers", `
+    <div class="bulk-steps">
+      <div class="bulk-step">
+        <span>1</span>
+        <div>
+          <b>Download the sample file</b>
+          <p>Column A: <code>serialNumber</code> (required) · B: <code>wireLength</code> · C: <code>batch</code> (optional)</p>
+          <button type="button" class="btn btn-light" id="bulkSample">⬇ DOWNLOAD SAMPLE CSV</button>
+        </div>
+      </div>
+      <div class="bulk-step">
+        <span>2</span>
+        <div>
+          <b>Upload your file (CSV or Excel)</b>
+          <label class="drop-zone" id="bulkDrop">
+            <input type="file" id="bulkFile" accept=".csv,.txt,.xlsx,.xls" hidden>
+            <strong>Click to choose file</strong> or drag &amp; drop here
+            <small>.csv · .xlsx · .xls — up to 3000 serial numbers per upload</small>
+          </label>
+          <p class="bulk-or">— or paste serial numbers (one per line) —</p>
+          <textarea id="bulkPaste" rows="4" placeholder="SAFE/ESCAPE/IIZG/006&#10;SAFE/ESCAPE/IIZG/007"></textarea>
+        </div>
+      </div>
+      <div class="bulk-step">
+        <span>3</span>
+        <div>
+          <b>Check &amp; upload</b>
+          <div id="bulkPreview" class="bulk-preview muted">No serial numbers selected yet.</div>
+          <button type="button" class="btn btn-primary" id="bulkSubmitBtn" disabled>⬆ UPLOAD SERIAL NUMBERS</button>
+        </div>
+      </div>
+    </div>`);
+
+  const preview = $("#bulkPreview");
+  const uploadBtn = $("#bulkSubmitBtn");
+
+  const showParsed = (rows, source) => {
+    const seen = new Set();
+    parsed = rows.filter(r => !seen.has(r.serialNumber) && seen.add(r.serialNumber));
+    uploadBtn.disabled = !parsed.length;
+    preview.classList.toggle("muted", !parsed.length);
+    preview.innerHTML = parsed.length
+      ? `<b>${parsed.length}</b> unique serial number${parsed.length === 1 ? "" : "s"} ready from ${escapeHtml(source)}
+         <div class="bulk-sample">${parsed.slice(0, 6).map(r =>
+           `<code>${escapeHtml(r.serialNumber)}${r.wireLength ? ` · ${escapeHtml(r.wireLength)}m` : ""}</code>`).join("")}${parsed.length > 6 ? `<em>+${parsed.length - 6} more</em>` : ""}</div>`
+      : "No serial numbers found. Check that column A has serial numbers.";
+  };
+
+  const handleFile = async file => {
+    if (!file) return;
+    preview.textContent = "Reading file…";
+    try {
+      showParsed(await parseSerialFile(file), file.name);
+    } catch (error) {
+      console.error(error);
+      preview.textContent = "Could not read this file. Please use the sample CSV format.";
+    }
+  };
+
+  $("#bulkSample").addEventListener("click", downloadSample);
+  $("#bulkFile").addEventListener("change", e => handleFile(e.target.files[0]));
+
+  const drop = $("#bulkDrop");
+  ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => handleFile(e.dataTransfer.files[0]));
+
+  $("#bulkPaste").addEventListener("input", e => {
+    const lines = e.target.value.split(/\r?\n/).map(splitCsvLine);
+    showParsed(rowsFromTable(lines), "pasted text");
+  });
+
+  uploadBtn.addEventListener("click", async () => {
+    if (!parsed.length) return;
+    setButtonLoading(uploadBtn, true, "UPLOADING…");
+    const total = { added: 0, existing: 0, invalid: 0, invalidSamples: [] };
+    try {
+      for (let i = 0; i < parsed.length; i += 3000) {
+        const r = await warrantyApi("uploadSerials", { rows: parsed.slice(i, i + 3000) });
+        total.added += r.added; total.existing += r.existing; total.invalid += r.invalid;
+        total.invalidSamples.push(...(r.invalidSamples || []));
+      }
+
+      $("#detailContent").innerHTML = `
+        <div class="bulk-done">
+          <div class="bulk-done-icon">✓</div>
+          <h3>Thank you for the bulk upload!</h3>
+          <p>Your serial numbers have been saved. Customers can now register warranty with these serial numbers.</p>
+          <div class="bulk-result">
+            <div class="ok"><b>${total.added}</b><span>New serials added</span></div>
+            <div><b>${total.existing}</b><span>Already existed (skipped)</span></div>
+            <div class="${total.invalid ? "bad" : ""}"><b>${total.invalid}</b><span>Invalid (skipped)</span></div>
+          </div>
+          ${total.invalidSamples.length ? `<p class="auto-error">Invalid examples: ${total.invalidSamples.slice(0, 8).map(escapeHtml).join(", ")}</p>` : ""}
+          <div class="modal-actions" style="justify-content:center">
+            <button type="button" class="btn btn-light" id="bulkAgain">UPLOAD MORE</button>
+            <button type="button" class="btn btn-primary" id="bulkViewList">VIEW SERIAL NUMBERS</button>
+          </div>
+        </div>`;
+      $("#bulkAgain").addEventListener("click", openBulkUpload);
+      $("#bulkViewList").addEventListener("click", openSerialList);
+
+      if (state.warrantyMeta?.serials) {
+        state.warrantyMeta.serials.total += total.added;
+        updateWarrantyCounts(state.records);
+      }
+      showToast(`${total.added} serial numbers added.`, "success");
+    } catch (error) {
+      console.error(error);
+      showToast(error.message || "Bulk upload failed.", "error");
+      setButtonLoading(uploadBtn, false);
+    }
+  });
+}
+
+
+/* =========================================================
+   SERIAL NUMBER LIST
+========================================================= */
+
+async function openSerialList() {
+  openModal("SERIAL NUMBERS", "Uploaded Serial Numbers", `<div class="admin-loading"><span></span> Loading serial numbers…</div>`);
+
+  let rows = [];
+  try {
+    rows = (await warrantyApi("serials")).rows || [];
+  } catch (error) {
+    $("#detailContent").innerHTML = `<div class="admin-empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  const st = { q: "", f: "all", page: 1 };
+  const SIZE = 10;
+
+  const statusOf = r => !r.active ? "inactive" : r.warrantyStatus === "approved" ? "approved"
+    : r.registered ? "registered" : "available";
+
+  $("#detailContent").innerHTML = `
+    <div class="table-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="serialSearch" placeholder="Search serial number or batch…">
+      </div>
+      <select id="serialFilter" class="toolbar-select">
+        <option value="all">All (${rows.length})</option>
+        <option value="available">Available</option>
+        <option value="registered">Registered (pending)</option>
+        <option value="approved">Warranty approved</option>
+      </select>
+      <button type="button" class="btn btn-light" id="serialBulk">⬆ BULK UPLOAD</button>
+    </div>
+    <div id="serialTable"></div>
+    <div class="pagination" id="serialPager"></div>`;
+
+  const draw = () => {
+    const q = st.q.toLowerCase();
+    const list = rows.filter(r =>
+      (!q || `${r.serialNumber} ${r.batch}`.toLowerCase().includes(q)) &&
+      (st.f === "all" || statusOf(r) === st.f));
+    const pages = Math.max(1, Math.ceil(list.length / SIZE));
+    st.page = Math.min(st.page, pages);
+    const start = (st.page - 1) * SIZE;
+    const slice = list.slice(start, start + SIZE);
+
+    $("#serialTable").innerHTML = slice.length ? `
+      <div class="data-table-wrap">
+        <table class="data-table" style="min-width:640px">
+          <thead><tr><th>Serial No.</th><th>Wire</th><th>Batch</th><th>Uploaded</th><th>Status</th><th class="th-actions">Action</th></tr></thead>
+          <tbody>
+            ${slice.map(r => `
+              <tr>
+                <td><b class="cell-main mono serial">${escapeHtml(r.serialNumber)}</b></td>
+                <td>${r.wireLength ? escapeHtml(r.wireLength) + " m" : "—"}</td>
+                <td>${escapeHtml(r.batch || "—")}</td>
+                <td class="nowrap">${r.createdAt ? formatDate(r.createdAt) : "—"}</td>
+                <td>${statusTag(statusOf(r))}${r.warrantyEnd ? `<small class="cell-sub">till ${prettyDay(r.warrantyEnd)}</small>` : ""}</td>
+                <td class="td-actions">${!r.registered
+                  ? `<button type="button" class="row-btn delete" data-del-serial="${escapeHtml(r.serialNumber)}">🗑 Delete</button>` : "—"}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>` : `<div class="admin-empty"><b>No serial numbers found</b><p>Upload serial numbers using Bulk Upload.</p></div>`;
+
+    $("#serialPager").innerHTML = list.length ? `
+      <span class="page-info">Showing <b>${start + 1}–${start + slice.length}</b> of <b>${list.length}</b></span>
+      <div class="page-buttons">
+        <button type="button" data-sp="${st.page - 1}" ${st.page === 1 ? "disabled" : ""}>‹ Prev</button>
+        <button type="button" class="active">${st.page} / ${pages}</button>
+        <button type="button" data-sp="${st.page + 1}" ${st.page === pages ? "disabled" : ""}>Next ›</button>
+      </div>` : "";
+  };
+
+  $("#serialSearch").addEventListener("input", e => { st.q = e.target.value.trim(); st.page = 1; draw(); });
+  $("#serialFilter").addEventListener("change", e => { st.f = e.target.value; st.page = 1; draw(); });
+  $("#serialBulk").addEventListener("click", openBulkUpload);
+  $("#serialPager").addEventListener("click", e => {
+    const b = e.target.closest("[data-sp]");
+    if (b && !b.disabled) { st.page = Number(b.dataset.sp); draw(); }
+  });
+  $("#serialTable").addEventListener("click", async e => {
+    const b = e.target.closest("[data-del-serial]");
+    if (!b) return;
+    const serial = b.dataset.delSerial;
+    const sure = await confirmDialog({
+      title: `Delete ${serial}?`,
+      text: "Customers will not be able to register warranty with this serial number.",
+      okText: "Yes, delete"
+    });
+    if (!sure) return;
+    setButtonLoading(b, true, "…");
+    try {
+      await warrantyApi("deleteSerial", { serialNumber: serial });
+      rows = rows.filter(r => r.serialNumber !== serial);
+      if (state.warrantyMeta?.serials) { state.warrantyMeta.serials.total -= 1; updateWarrantyCounts(state.records); }
+      showToast(`Serial ${serial} deleted.`, "success");
+      draw();
+    } catch (error) {
+      showToast(error.message, "error");
+      setButtonLoading(b, false);
+    }
+  });
+
+  draw();
+}
+
+$("#bulkUploadBtn")?.addEventListener("click", openBulkUpload);
+$("#sampleCsvBtn")?.addEventListener("click", downloadSample);
+$("#serialListBtn")?.addEventListener("click", openSerialList);
