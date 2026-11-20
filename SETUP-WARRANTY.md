@@ -38,7 +38,7 @@ Registrations submitted more than 15 days after purchase are still accepted but 
 
    | Property | Value |
    |---|---|
-   | `SECRET` | any long random text, e.g. `se-warranty-8f3k29dl20xq` |
+   | `SECRET` | any long random text (never write it in any file in the repo) |
    | `ADMIN_EMAIL` | `safeescapesolutions@gmail.com` |
    | `SHEET_ID` | *(optional)* your Google Sheet ID |
    | `DRIVE_FOLDER_ID` | *(optional)* Drive folder ID for photos |
